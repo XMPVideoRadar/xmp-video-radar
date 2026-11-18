@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090b13"><title>XMP VIDEO RADAR</title>
+<style>
+:root{color-scheme:dark;--bg:#090b13;--panel:#121725;--line:#242d40;--muted:#8e9ab1;--cyan:#55e6ff;--pink:#ff4fd8;--gold:#ffc857}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#19334b 0,transparent 48%),var(--bg);color:#f3f6ff;font:16px/1.5 system-ui,Segoe UI,sans-serif}
+header{border-bottom:1px solid var(--line);background:#090b13dd;position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}
+.wrap{max-width:1150px;margin:auto;padding:18px 22px}.brand{display:flex;align-items:center;gap:13px}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),#6d65ff 55%,var(--pink));display:grid;place-items:center;color:#08101a;font-weight:1000;font-size:20px;box-shadow:0 0 25px #55e6ff44}
+h1{font-size:19px;letter-spacing:2px;margin:0}.brand small{color:var(--muted);letter-spacing:1px}
+.hero{padding:48px 22px 30px;text-align:center}.eyebrow{color:var(--cyan);font-size:12px;letter-spacing:3px;font-weight:800}.hero h2{font-size:clamp(34px,7vw,66px);line-height:1.02;margin:12px 0;background:linear-gradient(90deg,#fff,var(--cyan),var(--pink));background-clip:text;color:transparent;letter-spacing:-2px}.hero p{color:var(--muted);margin:0}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0}.status{font-size:13px;color:var(--muted)}.status b{color:#70f2a5}.btn{border:1px solid #34536a;background:#102435;color:var(--cyan);border-radius:9px;padding:9px 14px;font-weight:700;cursor:pointer}.btn:hover{background:#19364b}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}.video{background:linear-gradient(160deg,#171f30,#101521);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:.2s}.video:hover{transform:translateY(-3px);border-color:#3d819b;box-shadow:0 12px 35px #0007}.thumb{display:block;position:relative;aspect-ratio:16/9;background:#080c14}.thumb img{width:100%;height:100%;object-fit:cover}.play{position:absolute;inset:0;display:grid;place-items:center;font-size:42px;color:white;text-shadow:0 2px 12px #000}.info{padding:15px}.date{font-size:12px;color:var(--cyan)}.info h3{font-size:17px;line-height:1.3;margin:7px 0 12px}.actions{display:flex;justify-content:space-between;align-items:center;gap:8px}.stars{color:var(--gold);letter-spacing:1px}.rate button{background:none;border:0;color:#66748c;font-size:21px;cursor:pointer;padding:0 1px}.rate button.active{color:var(--gold)}.comments{margin-top:13px;border-top:1px solid var(--line);padding-top:12px}.comments summary{cursor:pointer;color:#b7c6dc;font-size:13px}.comments form{display:flex;gap:6px;margin-top:10px}.comments input{min-width:0;flex:1;background:#0b101b;border:1px solid var(--line);border-radius:7px;padding:9px;color:white}.comments button{background:#1b3850;border:1px solid #34536a;border-radius:7px;color:var(--cyan);padding:0 11px;cursor:pointer}.comment{font-size:13px;color:#b8c3d7;margin-top:8px;overflow-wrap:anywhere}.empty,.error{grid-column:1/-1;text-align:center;padding:42px 20px;background:var(--panel);border:1px solid var(--line);border-radius:14px;color:var(--muted)}footer{text-align:center;color:#66748c;font-size:12px;padding:35px 15px}
+@media(max-width:520px){.wrap{padding:15px}.hero{padding-top:35px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap brand"><div class="logo">X</div><div><h1>XMP VIDEO RADAR</h1><small>VŠECHNA NOVÁ VIDEA NA JEDNOM MÍSTĚ</small></div></div></header>
+<section class="hero"><div class="eyebrow">/// RADAR ONLINE</div><h2>NEZMEŠKEJ<br>ŽÁDNÉ VIDEO.</h2><p>Nejnovější tvorba kanálu Plej. Hodnoť, komentuj a sleduj novinky.</p></section>
+<main class="wrap"><div class="toolbar"><div class="status" id="status">● Připojuji se k YouTube…</div><button class="btn" id="refresh">↻ Obnovit videa</button></div><section class="grid" id="videos"><div class="empty">Načítám videa z kanálu Plej…</div></section></main>
+<footer>XMP VIDEO RADAR · Neoficiální fanouškovský projekt · Videa patří jejich autorovi.</footer>
+<script>
+const CHANNEL='UCetPKBY7gqLbS3th07d4JLw';
+const FEED='https://www.youtube.com/feeds/videos.xml?channel_id='+CHANNEL;
+const API='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(FEED);
+const root=document.getElementById('videos'),status=document.getElementById('status');
+const key='xmp-radar-local-v1';
+function saved(){try{return JSON.parse(localStorage.getItem(key)||'{}')}catch{return {}}}
+function store(data){localStorage.setItem(key,JSON.stringify(data))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function date(s){const d=new Date(s);return isNaN(d)?'':d.toLocaleDateString('cs-CZ',{day:'numeric',month:'long',year:'numeric'})}
+function render(items){
+ if(!items.length){root.innerHTML='<div class="empty">Zatím se nepodařilo načíst žádná videa. Zkus obnovit stránku později.</div>';return}
+ const data=saved();
+ root.innerHTML=items.map(v=>{
+  const id=v.guid||v.link,entry=data[id]||{rating:0,comments:[]},avg=entry.rating||0;
+  const title=esc(v.title),link=esc(v.link),img=esc(v.thumbnail||'');
+  return '<article class="video"><a class="thumb" href="'+link+'" target="_blank" rel="noopener"><img src="'+img+'" alt="'+title+'" loading="lazy"><span class="play">▶</span></a><div class="info"><div class="date">'+date(v.pubDate)+'</div><h3>'+title+'</h3><div class="actions"><span class="stars">'+(avg?'★'.repeat(avg)+'☆'.repeat(5-avg):'☆☆☆☆☆')+'</span><div class="rate" data-id="'+esc(id)+'">'+[1,2,3,4,5].map(n=>'<button aria-label="Hodnotit '+n+' z 5" data-rating="'+n+'" class="'+(n<=avg?'active':'')+'">★</button>').join('')+'</div></div><details class="comments"><summary>Komentáře ('+entry.comments.length+')</summary><div class="comment-list">'+entry.comments.map(c=>'<div class="comment">'+esc(c)+'</div>').join('')+'</div><form data-id="'+esc(id)+'"><input maxlength="240" placeholder="Napiš komentář…" required><button>Odeslat</button></form></details></div></article>';
+ }).join('');
+ root.querySelectorAll('.rate button').forEach(b=>b.addEventListener('click',()=>{const d=saved(),id=b.parentElement.dataset.id;d[id]=d[id]||{comments:[]};d[id].rating=Number(b.dataset.rating);store(d);render(items)}));
+ root.querySelectorAll('.comments form').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const d=saved(),id=f.dataset.id;d[id]=d[id]||{rating:0,comments:[]};d[id].comments.push(f.querySelector('input').value.trim());store(d);render(items)}));
+}
+async function load(){
+ status.textContent='● Načítám novinky…';
+ try{const r=await fetch(API);if(!r.ok)throw Error('Síťová chyba');const j=await r.json();if(j.status!=='ok')throw Error(j.message||'RSS není dostupné');const items=(j.items||[]).filter(x=>x.link&&x.title);render(items);status.innerHTML='<b>● Online</b> · '+items.length+' posledních videí · obnoveno '+new Date().toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'})}
+ catch(e){status.textContent='● Videa se nepodařilo načíst';root.innerHTML='<div class="error">YouTube feed je momentálně nedostupný. Zkus to za chvíli znovu.<br><br>'+esc(e.message)+'</div>'}
+}
+document.getElementById('refresh').addEventListener('click',load);load();setInterval(load,300000);
+</script>
+</body></html>
