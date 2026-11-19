@@ -129,7 +129,7 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
 .avatar-choice .mini-avatar{display:block;width:28px;height:34px;margin:0 auto 5px;border-radius:9px 9px 5px 5px;background:linear-gradient(145deg,var(--trim),var(--suit));border:2px solid #ffffff77;box-shadow:5px 4px 0 #0006}
 .avatar-choice b{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .avatar-choice small{font-size:9px;color:#9aacc6}
-.rarity-common{color:#c2ccdc}.rarity-rare{color:#64d5ff}.rarity-epic{color:#d69aff}.rarity-legendary{color:#ffd66d}
+.rarity-common{color:#c2ccdc}.rarity-uncommon{color:#7bdf9b}.rarity-rare{color:#64d5ff}.rarity-epic{color:#d69aff}.rarity-legendary{color:#ffd66d}.rarity-mythic{color:#ff735e;text-shadow:0 0 8px #ff735e66}.rarity-secret{color:#e78aff;text-shadow:0 0 8px #e78aff77}.rarity-god{color:#fff2a1;text-shadow:0 0 9px #fff2a1}.rarity-quantity{color:#65ffe0;text-shadow:0 0 9px #65ffe0}.rarity-celestial{color:#8edbff;text-shadow:0 0 9px #8edbff}.rarity-celestial-plus{color:#b6a0ff;text-shadow:0 0 10px #b6a0ff}.rarity-eternal{color:#ff9bdc;text-shadow:0 0 10px #ff9bdc}.rarity-eternal-plus{color:#76fff2;text-shadow:0 0 10px #76fff2}.rarity-og{color:#ffd78a;text-shadow:0 0 10px #ffd78a}.rarity-extreme-og{color:#ff3df2;text-shadow:0 0 8px #ff3df2,0 0 18px #7c42ff}
 .avatar-footer{display:flex;gap:9px;align-items:center;flex-wrap:wrap;justify-content:space-between}
 .avatar-footer .btn{border-color:#6b5595;background:#241c3a;color:#e5d1ff}
 @media(max-width:700px){.avatar-layout{grid-template-columns:1fr}.avatar-preview{min-height:270px}.avatar-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -284,23 +284,26 @@ document.getElementById('backup-file')?.addEventListener('change',async event=>{
 /* XMP 8.0 — locally saved 3D avatar studio */
 const avatarDefs=[
  {name:'XMP Rookie',rarity:'COMMON',className:'common',suit:'#477bd4',trim:'#55e6ff',gear:'🎧'},
- {name:'Neon Runner',rarity:'COMMON',className:'common',suit:'#12a8a8',trim:'#8affdf',gear:'⚡'},
+ {name:'Neon Runner',rarity:'UNCOMMON',className:'uncommon',suit:'#12a8a8',trim:'#8affdf',gear:'⚡'},
  {name:'Shadow Ninja',rarity:'RARE',className:'rare',suit:'#30364d',trim:'#a18aff',gear:'😈'},
- {name:'Frost Byte',rarity:'RARE',className:'rare',suit:'#347cae',trim:'#c7f7ff',gear:'🕶️'},
- {name:'Toxic Hacker',rarity:'RARE',className:'rare',suit:'#397b42',trim:'#a5ff54',gear:'🚀'},
- {name:'Flame Beast',rarity:'EPIC',className:'epic',suit:'#a52d38',trim:'#ff9b43',gear:'😈'},
- {name:'Cyber Knight',rarity:'EPIC',className:'epic',suit:'#4a3d91',trim:'#c6a1ff',gear:'👑'},
- {name:'Galaxy Pilot',rarity:'EPIC',className:'epic',suit:'#273a78',trim:'#ff69dc',gear:'🚀'},
- {name:'Jade Guardian',rarity:'EPIC',className:'epic',suit:'#176b5b',trim:'#74ffd0',gear:'✨'},
- {name:'Golden Legend',rarity:'LEGENDARY',className:'legendary',suit:'#9a6a13',trim:'#ffe17a',gear:'👑'},
- {name:'Void Emperor',rarity:'LEGENDARY',className:'legendary',suit:'#38205f',trim:'#e78aff',gear:'😈'},
- {name:'XMP Overlord',rarity:'LEGENDARY',className:'legendary',suit:'#8e245e',trim:'#ff8fd7',gear:'⚡'}
+ {name:'Frost Byte',rarity:'EPIC',className:'epic',suit:'#347cae',trim:'#c7f7ff',gear:'🕶️'},
+ {name:'Toxic Hacker',rarity:'LEGENDARY',className:'legendary',suit:'#397b42',trim:'#a5ff54',gear:'🚀'},
+ {name:'Flame Beast',rarity:'MYTHIC',className:'mythic',suit:'#a52d38',trim:'#ff9b43',gear:'😈'},
+ {name:'Cyber Knight',rarity:'SECRET',className:'secret',suit:'#4a3d91',trim:'#c6a1ff',gear:'👑'},
+ {name:'Galaxy Pilot',rarity:'GOD',className:'god',suit:'#273a78',trim:'#ff69dc',gear:'🚀'},
+ {name:'Jade Guardian',rarity:'QUANTITY',className:'quantity',suit:'#176b5b',trim:'#74ffd0',gear:'✨'},
+ {name:'Golden Legend',rarity:'CELESTIAL',className:'celestial',suit:'#9a6a13',trim:'#ffe17a',gear:'👑'},
+ {name:'Void Emperor',rarity:'CELESTIAL+',className:'celestial-plus',suit:'#38205f',trim:'#e78aff',gear:'😈'},
+ {name:'XMP Overlord',rarity:'ETERNAL',className:'eternal',suit:'#8e245e',trim:'#ff8fd7',gear:'⚡'},
+ {name:'Eternal Warden',rarity:'ETERNAL+',className:'eternal-plus',suit:'#174b58',trim:'#76fff2',gear:'🛡️'},
+ {name:'OG Legend',rarity:'OG',className:'og',suit:'#5b4320',trim:'#ffd78a',gear:'👑'},
+ {name:'XMP Extreme OG',rarity:'EXTREME OG',className:'extreme-og',suit:'#17152e',trim:'#ff3df2',gear:'💠'}
 ];
 const avatarColors={cyan:['#477bd4','#55e6ff'],purple:['#5940a0','#c6a1ff'],red:['#a52d38','#ff9b43'],green:['#397b42','#a5ff54'],gold:['#9a6a13','#ffe17a'],pink:['#8e245e','#ff8fd7']};
 const avatarKey='xmp-avatar-v1';
 const bonusXpKey='xmp-radar-bonus-xp-v1';
-function getBonusXp(){try{return Math.max(0,Math.min(9900,Number(localStorage.getItem(bonusXpKey))||0))}catch{return 0}}
-function runAvatarCommand(){const input=document.getElementById('avatar-command-input'),output=document.getElementById('avatar-command-output'),command=input.value.trim().toLowerCase(),match=command.match(/^\/level\s+(\d{1,3})$/);if(match){const target=Math.max(1,Math.min(100,Number(match[1])));try{const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}const base=favorites*5+ratings*3+comments*2+(claimed?25:0);localStorage.setItem(bonusXpKey,String(Math.max(0,(target-1)*100-base)));output.textContent='✓ Level nastaven na '+target+'. XP a avatary byly aktualizovány.';render();location.reload()}catch{output.textContent='Prohlížeč nedovolil uložit level.'}return}if(command==='/level reset'){try{localStorage.removeItem(bonusXpKey);output.textContent='Level bonus byl resetován.';render();location.reload()}catch{output.textContent='Reset se nepodařil.'}return}output.textContent='Neznámý příkaz. Použij /level 100 nebo /level reset.'}
+function getBonusXp(){try{return Math.max(0,Math.min(999900,Number(localStorage.getItem(bonusXpKey))||0))}catch{return 0}}
+function runAvatarCommand(){const input=document.getElementById('avatar-command-input'),output=document.getElementById('avatar-command-output'),command=input.value.trim().toLowerCase(),match=command.match(/^\/level\s+(\d{1,5})$/);if(match){const target=Math.max(1,Math.min(10000,Number(match[1])));try{const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}const base=favorites*5+ratings*3+comments*2+(claimed?25:0);localStorage.setItem(bonusXpKey,String(Math.max(0,Math.min(999900,(target-1)*100-base))));output.textContent='✓ Level nastaven na '+target+'. XP a avatary byly aktualizovány.';render();location.reload()}catch{output.textContent='Prohlížeč nedovolil uložit level.'}return}if(command==='/level reset'){try{localStorage.removeItem(bonusXpKey);output.textContent='Level bonus byl resetován.';render();location.reload()}catch{output.textContent='Reset se nepodařil.'}return}output.textContent='Neznámý příkaz. Použij /level 10000 nebo /level reset.'}
 
 let selectedAvatar=0;
 function savedAvatar(){try{return JSON.parse(localStorage.getItem(avatarKey)||'{}')}catch{return {}}}
@@ -311,8 +314,8 @@ function renderAvatar(){
  document.getElementById('avatar-rarity').innerHTML='<span class="rarity-'+def.className+'">'+def.rarity+'</span> · '+esc(def.name.toUpperCase());
  document.querySelectorAll('.avatar-choice').forEach((el,i)=>el.setAttribute('aria-pressed',String(i===selectedAvatar)));
 }
-const avatarUnlockLevels=[1,10,18,27,36,45,54,63,72,81,90,100];
-function currentLevel(){const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}return Math.min(100,Math.floor((favorites*5+ratings*3+comments*2+(claimed?25:0)+getBonusXp())/100)+1)}
+const avatarUnlockLevels=[1,10,25,50,100,200,350,500,750,1000,2500,5000,7500,9000,10000];
+function currentLevel(){const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}return Math.min(10000,Math.floor((favorites*5+ratings*3+comments*2+(claimed?25:0)+getBonusXp())/100)+1)}
 function isAvatarUnlocked(index){return getProfileName().trim().toLowerCase()==='jan'||currentLevel()>=avatarUnlockLevels[index]}
 function refreshAvatarUnlocks(){const level=currentLevel(),janMode=getProfileName().trim().toLowerCase()==='jan',unlocked=avatarDefs.filter((a,i)=>isAvatarUnlocked(i)).length,info=document.getElementById('avatar-unlock-info');if(info)info.textContent=janMode?'👑 JAN MODE: Máš automaticky odemčené všechny avatary!':'LEVEL '+level+' · Odemčeno '+unlocked+'/'+avatarDefs.length+' avatarů.';document.querySelectorAll('.avatar-choice').forEach((button,i)=>{const open=isAvatarUnlocked(i);button.disabled=!open;button.title=open?'':'Odemkneš na levelu '+avatarUnlockLevels[i];const small=button.querySelector('small');if(small)small.textContent=open?avatarDefs[i].rarity:'🔒 LEVEL '+avatarUnlockLevels[i];const mini=button.querySelector('.mini-avatar');if(mini)mini.textContent=open?'':'🔒';});}
 function initAvatarStudio(){
