@@ -278,12 +278,82 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
   pointer-events:none
 }
 
+
+/* XMP GRAFFITI V2 — PRIMARY COLORS + BRICK WALL */
+.logo{
+  width:62px;height:48px;flex:0 0 62px;border-radius:4px;
+  background:
+    linear-gradient(90deg,transparent 0 3px,#6d3425 3px 4px,transparent 4px 100%),
+    repeating-linear-gradient(0deg,#8c4930 0 11px,#c17a4d 11px 13px,#6e3828 13px 15px),
+    repeating-linear-gradient(90deg,#a85c3a 0 28px,#633426 28px 30px);
+  color:#ffe53d;font-family:Impact,"Arial Black",system-ui,sans-serif;
+  font-size:24px;font-style:italic;font-weight:1000;letter-spacing:-3px;
+  transform:rotate(-7deg) skew(-7deg);
+  -webkit-text-stroke:1px #fff3a0;
+  text-shadow:2px 2px 0 #e52d35,4px 4px 0 #174bdb,-1px -1px 0 #fff;
+  filter:drop-shadow(0 3px 2px #000);box-shadow:0 0 0 2px #3a2019,0 0 12px #0009
+}
+.logo:before{
+  content:"";position:absolute;inset:-5px;z-index:-1;
+  background:radial-gradient(circle at 5% 10%,#ffe53d 0 2px,transparent 4px),
+  radial-gradient(circle at 95% 15%,#e52d35 0 3px,transparent 5px),
+  radial-gradient(circle at 10% 95%,#174bdb 0 3px,transparent 5px),
+  radial-gradient(circle at 92% 90%,#ffe53d 0 2px,transparent 4px);
+  filter:blur(1px)
+}
+.xmp-logo,.hero-xmp{
+  position:relative;isolation:isolate;display:inline-block;
+  padding:12px 30px 18px;margin:12px auto 18px;
+  font-family:Impact,"Arial Black",system-ui,sans-serif;
+  font-style:italic;font-weight:1000;letter-spacing:-.13em;
+  line-height:1;transform:rotate(-4deg) skew(-5deg);
+  color:#ffe53d;-webkit-text-stroke:2px #fff1a0;
+  text-shadow:4px 4px 0 #e52d35,8px 8px 0 #174bdb,
+    -2px -2px 0 #fff,0 0 18px #ffe53d88;
+  filter:drop-shadow(0 8px 5px #0009)
+}
+.xmp-logo{font-size:clamp(72px,18vw,170px)}
+.hero-xmp{font-size:clamp(58px,11vw,112px);margin:0 auto 22px;padding:12px 35px 20px}
+.xmp-logo:before,.hero-xmp:before{
+  content:"";position:absolute;z-index:-1;inset:-12% -8%;
+  border:5px solid #40251d;border-radius:5px;
+  background-color:#9c593a;
+  background-image:
+    linear-gradient(90deg,transparent 0 48%,#603624 48% 51%,transparent 51%),
+    linear-gradient(90deg,transparent 0 98%,#603624 98% 100%),
+    linear-gradient(0deg,transparent 0 91%,#5b3325 91% 100%),
+    repeating-linear-gradient(0deg,transparent 0 28px,#603624 29px 32px);
+  background-size:58px 32px,58px 32px,58px 32px,100% 32px;
+  box-shadow:inset 0 0 22px #24130e99,0 8px 18px #0009;
+  opacity:.98;transform:skew(2deg)
+}
+.xmp-logo:after{
+  content:"";position:absolute;z-index:-2;inset:-22% -15%;
+  background:
+    radial-gradient(circle at 5% 18%,#ffe53d 0 3px,transparent 6px),
+    radial-gradient(circle at 12% 90%,#e52d35 0 4px,transparent 7px),
+    radial-gradient(circle at 94% 14%,#174bdb 0 4px,transparent 7px),
+    radial-gradient(circle at 92% 88%,#ffe53d 0 3px,transparent 6px);
+  filter:blur(1px)
+}
+.hero-xmp:after{
+  content:"";position:absolute;z-index:-2;inset:-22% -15%;
+  background:
+    radial-gradient(circle at 5% 18%,#ffe53d 0 3px,transparent 6px),
+    radial-gradient(circle at 12% 90%,#e52d35 0 4px,transparent 7px),
+    radial-gradient(circle at 94% 14%,#174bdb 0 4px,transparent 7px),
+    radial-gradient(circle at 92% 88%,#ffe53d 0 3px,transparent 6px);
+  filter:blur(1px)
+}
+.hero{padding-top:32px}
+@media(max-width:600px){.hero-xmp{font-size:62px;padding:10px 24px 16px}.xmp-logo:before,.hero-xmp:before{inset:-10% -6%}}
+
 </style>
 </head>
 <body>
 <div class="welcome" id="welcome"><div class="welcome-box"><span class="welcome-heart">❤️</span><div class="xmp-logo">XMP</div><h2 class="welcome-title">Ahoj, <span>Jan!</span></h2><p class="welcome-text">Vítej na XMP VIDEO RADARU!<br>Všechna nejnovější videa na jednom místě.</p><span class="welcome-heart">❤️</span><button class="welcome-btn" id="welcome-enter" type="button" onclick="document.getElementById('welcome').remove()">VSTOUPIT NA RADAR 🚀</button></div></div>
 <header><div class="wrap brand"><div class="logo" aria-hidden="true">XMP</div><div><h1>XMP VIDEO RADAR</h1><small>20 NEJNOVĚJŠÍCH VIDEÍ NA JEDNOM MÍSTĚ</small></div></div></header>
-<section class="hero"><div class="eyebrow">/// RADAR ONLINE</div><h2>NEZMEŠKEJ<br>ŽÁDNÉ VIDEO.</h2><p>Nejnovější tvorba kanálu Plej. Najdi video, ohodnoť ho a ulož si své favority. Radar 2.0.</p></section>
+<section class="hero"><div class="hero-xmp" aria-label="XMP graffiti logo">XMP</div><div class="eyebrow">/// RADAR ONLINE</div><h2>NEZMEŠKEJ<br>ŽÁDNÉ VIDEO.</h2><p>Nejnovější tvorba kanálu Plej. Najdi video, ohodnoť ho a ulož si své favority. Radar 2.0.</p></section>
 <main class="wrap">
 <div class="toolbar"><div class="status" id="status" role="status" aria-live="polite">● Připojuji se k YouTube…</div><div class="controls"><span class="live-chip"><span class="live-dot"></span> RADAR LIVE</span><button class="btn radar4-btn" id="random-video" type="button">🎲 Náhodné video</button><button class="btn radar4-btn" id="cinema" type="button">🎥 Režim kina</button><button class="btn" id="refresh" type="button">↻ Obnovit videa</button><button class="btn" id="share" type="button">↗ Sdílet web</button></div></div>
 <section id="profile-section"><h3 class="section-title">👤 TVŮJ PROFIL</h3><div class="profile-panel"><strong id="profile-greeting">Ahoj, Jan!</strong><label for="profile-name">Jméno:</label><input id="profile-name" maxlength="24" value="Jan" autocomplete="nickname"><button class="btn" id="save-profile" type="button">Uložit profil</button><button class="btn" id="sound-toggle" type="button" aria-pressed="false">🔇 Zvuky vypnuté</button></div>
