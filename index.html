@@ -740,7 +740,7 @@ function initLobbyAvatar(){
   scene.add(new THREE.HemisphereLight(0xc9eaff,0x18223d,2.0));
   const key=new THREE.DirectionalLight(0xffffff,3.1);key.position.set(3,6,5);scene.add(key);
   const rim=new THREE.PointLight(0x55caff,22,9);rim.position.set(-3,3,-2);scene.add(rim);
-  const def=avatarDefs[0],model=buildXmpHero(def,[def.suit,def.trim],def.gear||'⚡',0);
+  const def=avatarDefs[0],model=buildXmpHero(def,[def.suit,def.trim],def.gear||'⚡',0);applyEquippedArmor(model.root);
   model.root.scale.setScalar(.78);model.root.position.y=-.12;scene.add(model.root);
   const animate=()=>{requestAnimationFrame(animate);model.root.rotation.y+=.004;model.aura.rotation.y-=.008;renderer.render(scene,camera)};
   animate();
@@ -773,7 +773,7 @@ function initXmp3D(){
 function updateThreeAvatar(def,palette,gear,index){
  if(!xmp3d.renderer){initXmp3D();if(!xmp3d.renderer)return}
  if(xmp3d.root)xmp3d.scene.remove(xmp3d.root);
- const model=buildXmpHero(def,palette,gear,index);xmp3d.root=model.root;xmp3d.aura=model.aura;xmp3d.scene.add(model.root);
+ const model=buildXmpHero(def,palette,gear,index);applyEquippedArmor(model.root);xmp3d.root=model.root;xmp3d.aura=model.aura;xmp3d.scene.add(model.root);
 }
 
 let selectedAvatar=0;
@@ -807,11 +807,41 @@ document.getElementById('mega10-box')?.addEventListener('click',()=>{const date=
 const armorRarities=[{id:'common',name:'COMMON',icon:'⚪',color:'#b8c2ce',bg:'#202a38',price:1,sets:['Stone Guard','Iron Scout','Dust Runner','Frost Plate','Shadow Basic']},{id:'uncommon',name:'UNCOMMON',icon:'🟢',color:'#64e69a',bg:'#143626',price:2,sets:['Forest Ranger','Toxic Shield','Emerald Knight','Jungle Armor','Mint Phantom']},{id:'rare',name:'RARE',icon:'🔵',color:'#62b7ff',bg:'#12314d',price:3,sets:['Azure Warrior','Storm Armor','Deep Sea','Crystal Guard','Sky Sentinel']},{id:'epic',name:'EPIC',icon:'🟣',color:'#c48aff',bg:'#302047',price:5,sets:['Void Knight','Arcane Suit','Galaxy Guard','Neon Phantom','Dream Armor']},{id:'legendary',name:'LEGENDARY',icon:'🟠',color:'#ffc857',bg:'#4a3014',price:8,sets:['Solar Champion','Dragon Lord','Golden Titan','Phoenix Armor','Royal XMP']},{id:'mythic',name:'MYTHIC',icon:'🔴',color:'#ff5d88',bg:'#4b162d',price:12,sets:['Blood Moon','Infinity Armor','Cosmic Overlord','Chaos Reaper','XMP God Armor']}];
 const armorParts=[{id:'boots',name:'👢 BOTY'},{id:'leggings',name:'🩳 KALHOTY'},{id:'chestplate',name:'🦺 CHESTPLATE'},{id:'helmet',name:'⛑️ HELMA'}];
 const armorStoreKey='xmp-armor-inventory-v1';
+function applyEquippedArmor(root){
+ try{
+  const data=JSON.parse(localStorage.getItem(armorStoreKey)||'{}'),eq=data.equipped||{};
+  const group=new THREE.Group();group.name='xmp-equipped-armor';
+  const rarityColor={common:'#b8c2ce',uncommon:'#64e69a',rare:'#62b7ff',epic:'#c48aff',legendary:'#ffc857',mythic:'#ff5d88'};
+  const makeMat=(key,metalness=.65,roughness=.28)=>new THREE.MeshStandardMaterial({color:rarityColor[String(key||'').split('-')[0]]||'#b8c2ce',metalness,roughness});
+  const add=(geo,mat,x,y,z,rx=0,ry=0,rz=0)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.castShadow=true;m.receiveShadow=true;group.add(m);return m};
+  const key=part=>eq[part]||'';
+  if(key('helmet')){
+   const m=makeMat(key('helmet'));add(new THREE.SphereGeometry(.39,24,16,0,Math.PI*2,0,Math.PI*.62),m,0,2.73,0);
+   add(new THREE.BoxGeometry(.64,.09,.16),m,0,2.49,.22);
+   const visor=new THREE.MeshStandardMaterial({color:'#162b42',metalness:.8,roughness:.16,emissive:'#55e6ff',emissiveIntensity:.35});
+   add(new THREE.BoxGeometry(.43,.075,.035),visor,0,2.65,.333);
+  }
+  if(key('chestplate')){
+   const m=makeMat(key('chestplate'));add(new THREE.BoxGeometry(.72,.58,.16),m,0,1.83,.285);
+   add(new THREE.BoxGeometry(.28,.36,.055),makeMat(key('chestplate'),.85,.2),0,1.84,.39);
+   for(const side of [-1,1])add(new THREE.SphereGeometry(.19,16,12),m,side*.42,2.02,.02,0,0,side*.15);
+  }
+  if(key('leggings')){
+   const m=makeMat(key('leggings'));
+   for(const side of [-1,1]){add(new THREE.BoxGeometry(.31,.58,.23),m,side*.23,1.02,.11,0,0,side*-.05);add(new THREE.BoxGeometry(.29,.32,.2),m,side*.24,.52,.13)}
+  }
+  if(key('boots')){
+   const m=makeMat(key('boots'));
+   for(const side of [-1,1]){add(new THREE.BoxGeometry(.37,.25,.55),m,side*.24,.2,.13);add(new THREE.BoxGeometry(.32,.08,.48),makeMat(key('boots'),.8,.22),side*.24,.09,.14)}
+  }
+  root.add(group);
+ }catch(e){console.warn('XMP armor render failed',e)}
+}
 function armorData(){try{return JSON.parse(localStorage.getItem(armorStoreKey)||'{}')}catch{return {}}}
 function armorSave(d){localStorage.setItem(armorStoreKey,JSON.stringify(d))}
 function armorItemKey(r,set,part){return r.id+'-'+set+'-'+part}
 function armorRender(){const host=document.getElementById('armor-catalog');if(!host)return;const d=armorData(),coins=Number(localStorage.getItem('mega10-coins')||0);const wallet=document.getElementById('armor-coins');if(wallet)wallet.textContent=coins;host.innerHTML=armorRarities.map(r=>'<div class="armor-rarity" style="--armor-color:'+r.color+';--armor-bg:'+r.bg+'"><h4>'+r.icon+' '+r.name+' · '+r.price+' 🪙 / kus</h4>'+r.sets.map((set,si)=>'<div class="armor-set"><strong>'+esc(set)+'</strong><div class="armor-pieces">'+armorParts.map(p=>{const key=armorItemKey(r,si,p.id),owned=!!d[key],eq=d.equipped&&d.equipped[p.id]===key;return '<button type="button" class="armor-piece '+(eq?'equipped':owned?'owned':'')+'" data-armor-key="'+key+'" data-armor-price="'+r.price+'" data-armor-part="'+p.id+'">'+p.name+'<br>'+(eq?'✓ NASAZENO':owned?'✓ VLASTNÍ':'Koupit '+r.price+' 🪙')+'</button>'}).join('')+'</div></div>').join('')+'</div>').join('')}
-document.getElementById('armor-catalog')?.addEventListener('click',event=>{const b=event.target.closest('[data-armor-key]');if(!b)return;const key=b.dataset.armorKey,price=Number(b.dataset.armorPrice),part=b.dataset.armorPart,d=armorData(),coins=Number(localStorage.getItem('mega10-coins')||0);if(d[key]){d.equipped=d.equipped||{};d.equipped[part]=d.equipped[part]===key?'':key;armorSave(d);armorRender();return}if(coins<price){alert('Nemáš dost tokenů! Potřebuješ '+price+' 🪙. Tokeny získáš z Mystery Boxu.');return}localStorage.setItem('mega10-coins',String(coins-price));d[key]=true;d.equipped=d.equipped||{};d.equipped[part]=key;armorSave(d);armorRender();const t=document.getElementById('mega10-tokens');if(t)t.textContent=coins-price});
+document.getElementById('armor-catalog')?.addEventListener('click',event=>{const b=event.target.closest('[data-armor-key]');if(!b)return;const key=b.dataset.armorKey,price=Number(b.dataset.armorPrice),part=b.dataset.armorPart,d=armorData(),coins=Number(localStorage.getItem('mega10-coins')||0);if(d[key]){d.equipped=d.equipped||{};d.equipped[part]=d.equipped[part]===key?'':key;armorSave(d);armorRender();try{renderAvatar()}catch{}return}if(coins<price){alert('Nemáš dost tokenů! Potřebuješ '+price+' 🪙. Tokeny získáš z Mystery Boxu.');return}localStorage.setItem('mega10-coins',String(coins-price));d[key]=true;d.equipped=d.equipped||{};d.equipped[part]=key;armorSave(d);armorRender();try{renderAvatar()}catch{}const t=document.getElementById('mega10-tokens');if(t)t.textContent=coins-price});
 armorRender();
 
 // Initialize independent features separately so one broken widget cannot stop the feed.
