@@ -803,8 +803,37 @@ document.getElementById('armor-catalog')?.addEventListener('click',event=>{const
 armorRender();
 
 syncPlaylistUI();applyProfile();load();setInterval(load,300000);
-function loadThreeFallback(){if(window.THREE){initXmp3D();initLobbyAvatar();initAvatarStudio();return;}const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';script.onload=()=>{try{initXmp3D();initLobbyAvatar();initAvatarStudio()}catch(error){console.error('XMP 3D init error:',error)}};script.onerror=()=>{console.warn('Three.js failed to load; non-3D features remain active.');const note=document.getElementById('avatar-3d-loading');if(note)note.textContent='3D model nedostupný – ostatní web funguje.'};document.head.appendChild(script)}
-loadThreeFallback();
+function startXmp3D(){
+ try{
+  if(!window.THREE)throw new Error('Three.js není dostupný');
+  initXmp3D();
+  initLobbyAvatar();
+  initAvatarStudio();
+  if(!xmp3d.renderer)throw new Error('3D renderer se nepodařilo vytvořit');
+ }catch(error){
+  console.error('XMP avatar init failed:',error);
+  const note=document.getElementById('avatar-3d-loading');
+  if(note)note.textContent='Panáček se nepodařil načíst. Zkouším náhradní načtení…';
+  return false;
+ }
+ return true;
+}
+function loadThreeFallback(){
+ if(window.THREE){if(!startXmp3D())loadThreeBackup();return;}
+ const urls=['https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];
+ let index=0;
+ function attempt(){
+  if(window.THREE){startXmp3D();return;}
+  if(index>=urls.length){const note=document.getElementById('avatar-3d-loading');if(note)note.textContent='3D knihovna není dostupná. Zkontroluj připojení nebo blokování skriptů.';return;}
+  const script=document.createElement('script');script.src=urls[index++];script.onload=()=>{if(!startXmp3D())attempt()};script.onerror=attempt;document.head.appendChild(script);
+ }
+ attempt();
+}
+function loadThreeBackup(){
+ const urls=['https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];
+ let i=0;function next(){if(window.THREE){startXmp3D();return;}if(i>=urls.length){const note=document.getElementById('avatar-3d-loading');if(note)note.textContent='3D se nepodařilo načíst. Zkus obnovit stránku (Ctrl + F5).';return;}const sc=document.createElement('script');sc.src=urls[i++];sc.onload=startXmp3D;sc.onerror=next;document.head.appendChild(sc)}next();
+}
+if(document.readyState==='complete')loadThreeFallback();else window.addEventListener('load',loadThreeFallback,{once:true});
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
 </body>
