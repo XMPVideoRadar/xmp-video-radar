@@ -37,3 +37,11 @@ Neoficiální fanouškovský projekt. Videa a jejich obsah patří jejich autoro
 
 ## Sdílená databáze (příprava)
 Soubor `supabase.sql` připravuje tabulky pro společná hodnocení, komentáře a oblíbená videa s Row Level Security. **Databáze zatím není připojena k webu**: k aktivaci je nutné vytvořit Supabase projekt, spustit SQL v SQL Editoru a doplnit veřejnou Project URL a anon/publishable key spolu s přihlášením uživatelů. Tajný `service_role` klíč se nikdy nesmí vložit do webu ani repozitáře. Do té doby zůstávají interakce lokální v prohlížeči.
+
+
+## XMP 6.0 — Community Hub a zálohy
+- Nová sekce XMP Community Hub s přímým odkazem na Supabase Dashboard a připravený SQL skript.
+- Jasně zobrazený stav: komunitní databáze zatím čeká na konfiguraci; hodnocení, komentáře a oblíbené položky zůstávají lokální.
+- Export a import osobní zálohy ve formátu JSON (hodnocení, komentáře, oblíbená videa a jméno profilu).
+- Import ověřuje formát, velikost a základní strukturu dat a před nahrazením současných dat vyžaduje potvrzení.
+- Pro skutečné sdílení mezi návštěvníky je stále nutné doplnit URL a veřejný anon/publishable klíč konkrétního Supabase projektu a zapnout vhodný způsob přihlášení. Samotný Community Hub žádné online účty ani synchronizaci nepředstírá.
