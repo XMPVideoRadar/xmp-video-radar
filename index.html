@@ -864,5 +864,25 @@ function loadThreeBackup(){
 if(document.readyState==='complete')loadThreeFallback();else window.addEventListener('load',loadThreeFallback,{once:true});
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
+
+<!-- AVATAR EMERGENCY BOOTSTRAP: independent of the main application script -->
+<script>
+(function(){
+ const fallback='<div class="avatar-fallback"><div class="avatar-figure"><div class="avatar-gear" data-gear="⚡">⚡</div><div class="avatar-head"><i class="avatar-eye left"></i><i class="avatar-eye right"></i><i class="avatar-mouth"></i></div><div class="avatar-body"></div><div class="avatar-arm left"></div><div class="avatar-arm right"></div><div class="avatar-leg left"></div><div class="avatar-leg right"></div></div></div>';
+ function show(){
+  ['avatar-3d-stage','hero-character-stage'].forEach(id=>{const host=document.getElementById(id);if(host&&!host.querySelector('.avatar-fallback'))host.insertAdjacentHTML('beforeend',fallback)});
+  const note=document.getElementById('avatar-3d-loading');if(note)note.style.display='none';
+ }
+ function try3d(){
+  try{if(typeof window.startXmp3D==='function'&&window.startXmp3D()){document.querySelectorAll('.avatar-fallback').forEach(el=>el.remove());return true}if(typeof window.initXmp3D==='function'&&window.THREE){window.initXmp3D();const c=document.getElementById('avatar-3d-canvas');if(c&&c.parentElement.querySelector('canvas')){const note=document.getElementById('avatar-3d-loading');if(note)note.style.display='none';return true}}}catch(e){console.warn('XMP 3D fallback:',e)}
+  show();return false;
+ }
+ show();
+ if(window.THREE){try3d();return;}
+ const sources=['https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js','https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];let i=0;
+ function next(){if(window.THREE){try3d();return}if(i>=sources.length){show();return}const sc=document.createElement('script');sc.src=sources[i++];sc.onload=()=>{if(!try3d())next()};sc.onerror=next;document.head.appendChild(sc)}
+ next();
+})();
+</script>
 </body>
 </html>
