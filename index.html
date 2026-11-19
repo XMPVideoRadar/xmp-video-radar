@@ -447,7 +447,7 @@ function initXmp3D(){
  try{
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
   const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x101b32,8,18);
-  const camera=new THREE.PerspectiveCamera(35,stage.clientWidth/stage.clientHeight,.1,100);camera.position.set(0,2.1,5.7);
+  const camera=new THREE.PerspectiveCamera(35,stage.clientWidth/stage.clientHeight,.1,100);camera.position.set(0,2.1,5.7);camera.lookAt(0,1.55,0);
   scene.add(new THREE.HemisphereLight(0xc9eaff,0x18223d,2.0));
   const key=new THREE.DirectionalLight(0xffffff,3.1);key.position.set(3,6,5);key.castShadow=true;scene.add(key);
   const rim=new THREE.PointLight(0x55caff,22,9);rim.position.set(-3,3,-2);scene.add(rim);
