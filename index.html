@@ -375,12 +375,21 @@ header,.video,.playlist-panel,.quest-panel,.avatar-studio,.community-panel,.prof
 }
 main.wrap{position:relative}
 
+
+/* HERO CHARACTER FIX — render a visible 3D mascot in lobby */
+.hero{position:relative;min-height:360px;overflow:hidden}
+.hero-character-wrap{position:absolute;right:3%;top:30px;width:min(34vw,360px);height:330px;z-index:0;pointer-events:none;opacity:.92}
+.hero-character-stage{width:100%;height:100%;position:relative}
+#hero-avatar-canvas{width:100%;height:100%;display:block}
+.hero-xmp,.hero .eyebrow,.hero h2,.hero p{position:relative;z-index:1}
+.hero .hero-xmp{margin:0 auto 8px}
+@media(max-width:650px){.hero-character-wrap{right:-8%;top:42px;width:210px;height:260px;opacity:.42}.hero{min-height:300px}}
 </style>
 </head>
 <body>
 <div class="welcome" id="welcome"><div class="welcome-box"><span class="welcome-heart">❤️</span><div class="xmp-logo">XMP</div><h2 class="welcome-title">Ahoj, <span>Jan!</span></h2><p class="welcome-text">Vítej na XMP VIDEO RADARU!<br>Všechna nejnovější videa na jednom místě.</p><span class="welcome-heart">❤️</span><button class="welcome-btn" id="welcome-enter" type="button" onclick="document.getElementById('welcome').remove()">VSTOUPIT NA RADAR 🚀</button></div></div>
 <header><div class="wrap brand"><div class="logo" aria-hidden="true">XMP</div><div><h1>XMP VIDEO RADAR</h1><small>20 NEJNOVĚJŠÍCH VIDEÍ NA JEDNOM MÍSTĚ</small></div></div></header>
-<section class="hero"><div class="hero-xmp" aria-label="XMP graffiti logo">XMP</div><div class="eyebrow">/// RADAR ONLINE</div><h2>NEZMEŠKEJ<br>ŽÁDNÉ VIDEO.</h2><p>Nejnovější tvorba kanálu Plej. Najdi video, ohodnoť ho a ulož si své favority. Radar 2.0.</p></section>
+<section class="hero"><div class="hero-character-wrap"><div class="hero-character-stage"><canvas id="hero-avatar-canvas" aria-label="3D postavička XMP"></canvas></div></div><div class="hero-xmp" aria-label="XMP graffiti logo">XMP</div><div class="eyebrow">/// RADAR ONLINE</div><h2>NEZMEŠKEJ<br>ŽÁDNÉ VIDEO.</h2><p>Nejnovější tvorba kanálu Plej. Najdi video, ohodnoť ho a ulož si své favority. Radar 2.0.</p></section>
 <main class="wrap">
 <div class="toolbar"><div class="status" id="status" role="status" aria-live="polite">● Připojuji se k YouTube…</div><div class="controls"><span class="live-chip"><span class="live-dot"></span> RADAR LIVE</span><button class="btn radar4-btn" id="random-video" type="button">🎲 Náhodné video</button><button class="btn radar4-btn" id="cinema" type="button">🎥 Režim kina</button><button class="btn" id="refresh" type="button">↻ Obnovit videa</button><button class="btn" id="share" type="button">↗ Sdílet web</button></div></div>
 <section id="profile-section"><h3 class="section-title">👤 TVŮJ PROFIL</h3><div class="profile-panel"><strong id="profile-greeting">Ahoj, Jan!</strong><label for="profile-name">Jméno:</label><input id="profile-name" maxlength="24" value="Jan" autocomplete="nickname"><button class="btn" id="save-profile" type="button">Uložit profil</button><button class="btn" id="sound-toggle" type="button" aria-pressed="false">🔇 Zvuky vypnuté</button></div>
@@ -688,6 +697,27 @@ function buildXmpHero(def,palette,gear,index){
  for(let i=0;i<8;i++){const shard=addMesh(aura,new THREE.OctahedronGeometry(.075),glow,Math.cos(i*Math.PI/4)*1.02,1.65+Math.sin(i*Math.PI/4)*.7,Math.sin(i*Math.PI/4)*.55);shard.userData.phase=i}
  return {root,aura};
 }
+
+function initLobbyAvatar(){
+ const canvas=document.getElementById('hero-avatar-canvas');if(!canvas||!window.THREE)return;
+ try{
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  const stage=canvas.parentElement;
+  const resize=()=>{const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false)};
+  resize();if(window.ResizeObserver)new ResizeObserver(resize).observe(stage);else window.addEventListener('resize',resize);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(35,stage.clientWidth/Math.max(1,stage.clientHeight),.1,100);camera.position.set(0,2.1,5.7);camera.lookAt(0,1.55,0);
+  scene.add(new THREE.HemisphereLight(0xc9eaff,0x18223d,2.0));
+  const key=new THREE.DirectionalLight(0xffffff,3.1);key.position.set(3,6,5);scene.add(key);
+  const rim=new THREE.PointLight(0x55caff,22,9);rim.position.set(-3,3,-2);scene.add(rim);
+  const def=avatarDefs[0],model=buildXmpHero(def,[def.suit,def.trim],def.gear||'⚡',0);
+  model.root.scale.setScalar(.78);model.root.position.y=-.12;scene.add(model.root);
+  const animate=()=>{requestAnimationFrame(animate);model.root.rotation.y+=.004;model.aura.rotation.y-=.008;renderer.render(scene,camera)};
+  animate();
+ }catch(e){console.warn('Lobby avatar could not render',e)}
+}
+
 function initXmp3D(){
  const canvas=document.getElementById('avatar-3d-canvas'),stage=document.getElementById('avatar-3d-stage');if(!canvas||!stage||!window.THREE){const load=document.getElementById('avatar-3d-loading');if(load)load.textContent='3D se nepodařilo načíst. Zkontroluj připojení.';return}
  try{
@@ -743,7 +773,7 @@ function initAvatarStudio(){
  document.getElementById('save-avatar').addEventListener('click',()=>{if(!isAvatarUnlocked(selectedAvatar)){document.getElementById('avatar-save-note').textContent='Tento avatar je zatím zamčený.';return;}try{localStorage.setItem(avatarKey,JSON.stringify({id:selectedAvatar,color:document.getElementById('avatar-color').value,gear:document.getElementById('avatar-accessory').value}));document.getElementById('avatar-save-note').textContent='✓ Avatar uložen! Příště tu na tebe bude čekat.';heartBurst();}catch{document.getElementById('avatar-save-note').textContent='Prohlížeč nedovolil uložit avatara.';}});
 }
 
-syncPlaylistUI();initXmp3D();applyProfile();initAvatarStudio();load();setInterval(load,300000);
+syncPlaylistUI();initXmp3D();initLobbyAvatar();applyProfile();initAvatarStudio();load();setInterval(load,300000);
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
 </body>
