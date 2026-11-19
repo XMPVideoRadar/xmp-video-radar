@@ -456,10 +456,18 @@ const sort=document.getElementById('sort').value;
 list.sort((a,b)=>{if(sort==='oldest')return dateValue(a)-dateValue(b);if(sort==='rating')return (Number(entry(data,videoId(b)).rating)-Number(entry(data,videoId(a)).rating))||dateValue(b)-dateValue(a);return dateValue(b)-dateValue(a);});
 root.innerHTML=list.length?list.map(v=>renderCard(v)).join(''):'<div class="empty">'+(showPlaylistOnly&&playlist?'Tento playlist zatím neobsahuje žádná videa. Přepni zpět na všechna videa a přidej je tlačítkem „＋ Do playlistu“.':showFavorites?'Zatím nemáš žádná oblíbená videa. Přidej je kliknutím na ♡.':term?'Tomuto hledání neodpovídá žádné video.':'Žádná videa nejsou dostupná.')+'</div>';
 }
+async function fetchFeedWithFallback(){
+ const first=await fetch(API,{cache:'no-store'});
+ if(first.ok){const json=await first.json();if(json.status==='ok'&&Array.isArray(json.items))return json.items;}
+ const proxy=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(FEED),{cache:'no-store'});
+ if(!proxy.ok)throw new Error('RSS zdroje momentálně neodpovídají.');
+ const xmlText=await proxy.text(),xml=new DOMParser().parseFromString(xmlText,'text/xml');
+ if(xml.querySelector('parsererror'))throw new Error('Záložní RSS se nepodařilo přečíst.');
+ return Array.from(xml.querySelectorAll('entry')).map(entry=>{const title=entry.querySelector('title')?.textContent||'',link=entry.querySelector('link')?.getAttribute('href')||'',guid=entry.querySelector('id')?.textContent||link,pubDate=entry.querySelector('published')?.textContent||entry.querySelector('updated')?.textContent||'',thumbnail=entry.querySelector('media\\:thumbnail, thumbnail')?.getAttribute('url')||'';return {title,link,guid,pubDate,thumbnail}});
+}
 async function load(){if(loading)return;loading=true;const button=document.getElementById('refresh');button.disabled=true;status.textContent='● Načítám novinky…';
-try{const response=await fetch(API,{cache:'no-store'});if(!response.ok)throw new Error('Zdroj videí teď neodpovídá (HTTP '+response.status+').');const json=await response.json();if(json.status!=='ok')throw new Error(json.message||'YouTube RSS není dostupné.');
-videos=(json.items||[]).filter(v=>v.link&&v.title).sort((a,b)=>dateValue(b)-dateValue(a)).slice(0,20);render();refreshAvatarUnlocks();status.innerHTML='<b>● Online</b> · '+videos.length+' posledních videí · obnoveno '+new Date().toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'});
-}catch(error){status.textContent='● Videa se nepodařilo načíst';if(!videos.length)root.innerHTML='<div class="error">YouTube feed je momentálně nedostupný.<br>'+esc(error.message)+'<br><button class="btn" type="button" onclick="location.reload()">Zkusit znovu</button></div>';}
+try{const items=await fetchFeedWithFallback();videos=(items||[]).filter(v=>v.link&&v.title).sort((a,b)=>dateValue(b)-dateValue(a)).slice(0,20);render();refreshAvatarUnlocks();status.innerHTML='<b>● Online</b> · '+videos.length+' posledních videí · obnoveno '+new Date().toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'});
+}catch(error){status.textContent='● Videa se nepodařilo načíst';if(!videos.length)root.innerHTML='<div class="error">Videa se nepodařilo načíst z hlavního ani záložního zdroje.<br>'+esc(error.message)+'<br><button class="btn" type="button" onclick="location.reload()">Zkusit znovu</button></div>';}
 finally{loading=false;button.disabled=false;}}
 function markQuestProgress(key){const today=new Date().toLocaleDateString('sv-SE');let progress={date:today,rated:false,favorite:false};try{const old=JSON.parse(localStorage.getItem('xmp-quest-progress-v1')||'{}');if(old.date===today)progress=old;progress[key]=true;localStorage.setItem('xmp-quest-progress-v1',JSON.stringify(progress))}catch{}}
 root.addEventListener('click',handleAction);topRoot.addEventListener('click',handleAction);
@@ -773,7 +781,7 @@ function initAvatarStudio(){
  document.getElementById('save-avatar').addEventListener('click',()=>{if(!isAvatarUnlocked(selectedAvatar)){document.getElementById('avatar-save-note').textContent='Tento avatar je zatím zamčený.';return;}try{localStorage.setItem(avatarKey,JSON.stringify({id:selectedAvatar,color:document.getElementById('avatar-color').value,gear:document.getElementById('avatar-accessory').value}));document.getElementById('avatar-save-note').textContent='✓ Avatar uložen! Příště tu na tebe bude čekat.';heartBurst();}catch{document.getElementById('avatar-save-note').textContent='Prohlížeč nedovolil uložit avatara.';}});
 }
 
-syncPlaylistUI();initXmp3D();initLobbyAvatar();applyProfile();initAvatarStudio();load();setInterval(load,300000);
+syncPlaylistUI();applyProfile();initAvatarStudio();load();setInterval(load,300000);\nfunction loadThreeFallback(){if(window.THREE){initXmp3D();initLobbyAvatar();return;}const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';script.onload=()=>{initXmp3D();initLobbyAvatar()};script.onerror=()=>{const note=document.getElementById('avatar-3d-loading');if(note)note.textContent='3D model nedostupný – ostatní web funguje.'};document.head.appendChild(script)}\nloadThreeFallback();
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
 </body>
