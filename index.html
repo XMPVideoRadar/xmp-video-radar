@@ -30,6 +30,7 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
 </style>
 </head>
 <body>
+<div class="welcome" id="welcome"><div class="welcome-box"><span class="welcome-heart">❤️</span><div class="xmp-logo">XMP</div><h2 class="welcome-title">Ahoj, <span>Jan!</span></h2><p class="welcome-text">Vítej na XMP VIDEO RADARU!<br>Všechna nejnovější videa na jednom místě.</p><span class="welcome-heart">❤️</span><button class="welcome-btn" id="welcome-enter" type="button">VSTOUPIT NA RADAR 🚀</button></div></div>
 <header><div class="wrap brand"><div class="logo" aria-hidden="true">XMP</div><div><h1>XMP VIDEO RADAR</h1><small>20 NEJNOVĚJŠÍCH VIDEÍ NA JEDNOM MÍSTĚ</small></div></div></header>
 <section class="hero"><div class="eyebrow">/// RADAR ONLINE</div><h2>NEZMEŠKEJ<br>ŽÁDNÉ VIDEO.</h2><p>Nejnovější tvorba kanálu Plej. Najdi video, ohodnoť ho a ulož si své favority. Radar 2.0.</p></section>
 <main class="wrap">
@@ -86,7 +87,7 @@ document.getElementById('sort').addEventListener('change',render);
 document.getElementById('favorites-filter').addEventListener('click',event=>{showFavorites=!showFavorites;event.currentTarget.setAttribute('aria-pressed',String(showFavorites));event.currentTarget.textContent=showFavorites?'♥ Zobrazit všechna':'♡ Jen oblíbené';render();});
 document.getElementById('refresh').addEventListener('click',load);
 document.getElementById('share').addEventListener('click',async()=>{try{if(navigator.share)await navigator.share({title:'XMP VIDEO RADAR',url:location.href});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(location.href);alert('Odkaz zkopírován!')}else{prompt('Zkopíruj odkaz na web:',location.href)}}catch(error){if(error.name!=='AbortError')alert('Odkaz se nepodařilo sdílet.');}});
-document.getElementById('welcome-enter').addEventListener('click',()=>{document.getElementById('welcome').classList.add('hide');try{sessionStorage.setItem('xmp-welcome-seen','1')}catch{}});try{if(sessionStorage.getItem('xmp-welcome-seen')==='1')document.getElementById('welcome').classList.add('hide')}catch{}load();setInterval(load,300000);
+document.getElementById('welcome-enter')?.addEventListener('click',()=>document.getElementById('welcome')?.classList.add('hide'));load();setInterval(load,300000);
 </script>
 </body>
 </html>
