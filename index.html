@@ -419,9 +419,20 @@ main.wrap{position:relative}
 <p class="note">Hodnocení, komentáře, profil a oblíbená videa se ukládají v tomto prohlížeči. Pro sdílení mezi návštěvníky je připravena databázová struktura Supabase; její připojení vyžaduje konfiguraci projektu.</p>
 </main>
 <footer>XMP VIDEO RADAR 7.0 DAILY QUEST · Neoficiální fanouškovský projekt · Videa patří jejich autorovi.<br><a href="https://www.youtube.com/@plej111" target="_blank" rel="noopener noreferrer">Navštívit kanál Plej na YouTube ↗</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js" crossorigin="anonymous"></script>
 <script>
 'use strict';
+// EARLY ERROR GUARD: keep the radar usable even if an optional feature fails.
+window.addEventListener('error',event=>{
+ console.error('XMP startup/runtime error:',event.error||event.message);
+ const statusEl=document.getElementById('status');
+ if(statusEl)statusEl.textContent='● Část webu hlásí chybu: '+String(event.message||'neznámá chyba').slice(0,150);
+});
+window.addEventListener('unhandledrejection',event=>{
+ console.error('XMP async error:',event.reason);
+ const statusEl=document.getElementById('status');
+ if(statusEl)statusEl.textContent='● Chyba načítání: '+String(event.reason?.message||event.reason||'neznámá chyba').slice(0,150);
+});
+window.addEventListener('load',()=>{if(!loading&&!videos.length&&typeof load==='function')load();},{once:true});
 const CHANNEL='UCetPKBY7gqLbS3th07d4JLw';
 const FEED='https://www.youtube.com/feeds/videos.xml?channel_id='+CHANNEL;
 const API='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(FEED);
@@ -802,7 +813,11 @@ function armorRender(){const host=document.getElementById('armor-catalog');if(!h
 document.getElementById('armor-catalog')?.addEventListener('click',event=>{const b=event.target.closest('[data-armor-key]');if(!b)return;const key=b.dataset.armorKey,price=Number(b.dataset.armorPrice),part=b.dataset.armorPart,d=armorData(),coins=Number(localStorage.getItem('mega10-coins')||0);if(d[key]){d.equipped=d.equipped||{};d.equipped[part]=d.equipped[part]===key?'':key;armorSave(d);armorRender();return}if(coins<price){alert('Nemáš dost tokenů! Potřebuješ '+price+' 🪙. Tokeny získáš z Mystery Boxu.');return}localStorage.setItem('mega10-coins',String(coins-price));d[key]=true;d.equipped=d.equipped||{};d.equipped[part]=key;armorSave(d);armorRender();const t=document.getElementById('mega10-tokens');if(t)t.textContent=coins-price});
 armorRender();
 
-syncPlaylistUI();applyProfile();load();setInterval(load,300000);
+// Initialize independent features separately so one broken widget cannot stop the feed.
+for(const [label,fn] of [['playlist',syncPlaylistUI],['profile',applyProfile],['feed',load]]){
+ try{fn()}catch(error){console.error('XMP '+label+' init failed:',error);const statusEl=document.getElementById('status');if(statusEl)statusEl.textContent='● Chyba modulu '+label+': '+String(error.message||error).slice(0,120);}
+}
+setInterval(()=>{try{load()}catch(error){console.error('XMP refresh failed:',error)}},300000);
 function startXmp3D(){
  try{
   if(!window.THREE)throw new Error('Three.js není dostupný');
