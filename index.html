@@ -352,7 +352,22 @@ const avatarDefs=[
  {name:'XMP Overlord',rarity:'ETERNAL',className:'eternal',suit:'#8e245e',trim:'#ff8fd7',gear:'⚡'},
  {name:'Eternal Warden',rarity:'ETERNAL+',className:'eternal-plus',suit:'#174b58',trim:'#76fff2',gear:'🛡️'},
  {name:'OG Legend',rarity:'OG',className:'og',suit:'#5b4320',trim:'#ffd78a',gear:'👑'},
- {name:'XMP Extreme OG',rarity:'EXTREME OG',className:'extreme-og',suit:'#17152e',trim:'#ff3df2',gear:'💠'}
+ {name:'XMP Extreme OG',rarity:'EXTREME OG',className:'extreme-og',suit:'#17152e',trim:'#ff3df2',gear:'💠'},
+ {name:'Blue Recruit',rarity:'COMMON',className:'common',suit:'#315b9d',trim:'#b8eaff',gear:'🛡️'},
+ {name:'Pulse Sprinter',rarity:'UNCOMMON',className:'uncommon',suit:'#087c75',trim:'#b1ffe9',gear:'⚡'},
+ {name:'Phantom Operative',rarity:'RARE',className:'rare',suit:'#24243d',trim:'#bd9cff',gear:'😈'},
+ {name:'Arctic Striker',rarity:'EPIC',className:'epic',suit:'#286b9c',trim:'#e2ffff',gear:'🛡️'},
+ {name:'Biohazard Agent',rarity:'LEGENDARY',className:'legendary',suit:'#285b31',trim:'#d2ff48',gear:'☣️'},
+ {name:'Magma Titan',rarity:'MYTHIC',className:'mythic',suit:'#75202a',trim:'#ffc04a',gear:'😈'},
+ {name:'Cipher Sentinel',rarity:'SECRET',className:'secret',suit:'#30256e',trim:'#e2baff',gear:'🛡️'},
+ {name:'Nebula Ranger',rarity:'GOD',className:'god',suit:'#202b60',trim:'#ff9be8',gear:'🚀'},
+ {name:'Emerald Colossus',rarity:'QUANTITY',className:'quantity',suit:'#104c40',trim:'#a2ffdc',gear:'✨'},
+ {name:'Solar Champion',rarity:'CELESTIAL',className:'celestial',suit:'#80520b',trim:'#fff0a8',gear:'👑'},
+ {name:'Abyss Monarch',rarity:'CELESTIAL+',className:'celestial-plus',suit:'#291344',trim:'#f3a5ff',gear:'😈'},
+ {name:'Starlight Reaper',rarity:'ETERNAL',className:'eternal',suit:'#651442',trim:'#ffb5e7',gear:'⚡'},
+ {name:'Prism Warden',rarity:'ETERNAL+',className:'eternal-plus',suit:'#123d49',trim:'#a8fff8',gear:'🛡️'},
+ {name:'OG Renegade',rarity:'OG',className:'og',suit:'#463316',trim:'#ffe5a4',gear:'👑'},
+ {name:'XMP Ultra OG',rarity:'EXTREME OG',className:'extreme-og',suit:'#100d22',trim:'#ff78f7',gear:'💠'}
 ];
 const avatarColors={cyan:['#477bd4','#55e6ff'],purple:['#5940a0','#c6a1ff'],red:['#a52d38','#ff9b43'],green:['#397b42','#a5ff54'],gold:['#9a6a13','#ffe17a'],pink:['#8e245e','#ff8fd7']};
 const avatarKey='xmp-avatar-v1';
@@ -515,7 +530,7 @@ function renderAvatar(){
  document.getElementById('avatar-rarity').innerHTML='<span class="rarity-'+def.className+'">'+def.rarity+'</span> · '+esc(def.name.toUpperCase());
  document.querySelectorAll('.avatar-choice').forEach((el,i)=>el.setAttribute('aria-pressed',String(i===selectedAvatar)));
 }
-const avatarUnlockLevels=[1,10,25,50,100,200,350,500,750,1000,2500,5000,7500,9000,10000];
+const avatarUnlockLevels=[1,10,25,50,100,200,350,500,750,1000,2500,5000,7500,9000,10000,5,20,40,75,150,300,450,650,900,1500,3000,6000,8000,9500,15000];
 function currentLevel(){const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}return Math.floor((favorites*5+ratings*3+comments*2+(claimed?25:0)+getBonusXp())/100)+1}
 function isAvatarUnlocked(index){return isOwnerProfile()||currentLevel()>=avatarUnlockLevels[index]}
 function refreshAvatarUnlocks(){const level=currentLevel(),ownerMode=isOwnerProfile(),unlocked=avatarDefs.filter((a,i)=>isAvatarUnlocked(i)).length,info=document.getElementById('avatar-unlock-info');if(info)info.textContent=ownerMode?'👑 OWNER MODE · Alexander (Owner) · Všechny avatary odemčeny':'LEVEL '+level+' · Odemčeno '+unlocked+'/'+avatarDefs.length+' avatarů.';document.querySelectorAll('.avatar-choice').forEach((button,i)=>{const open=isAvatarUnlocked(i);button.disabled=!open;button.title=open?'':'Odemkneš na levelu '+avatarUnlockLevels[i];const small=button.querySelector('small');if(small)small.textContent=open?avatarDefs[i].rarity:'🔒 LEVEL '+avatarUnlockLevels[i];const mini=button.querySelector('.mini-avatar');if(mini)mini.textContent=open?'':'🔒';});if(!isAvatarUnlocked(selectedAvatar)){selectedAvatar=0;renderAvatar();}}
