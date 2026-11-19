@@ -71,7 +71,7 @@ const term=document.getElementById('search').value.trim().toLocaleLowerCase('cs'
 let list=videos.filter(v=>String(v.title||'').toLocaleLowerCase('cs').includes(term));
 if(showFavorites)list=list.filter(v=>entry(data,videoId(v)).favorite);
 const sort=document.getElementById('sort').value;
-list.sort((a,b)=>sort==='oldest'?dateValue(a)-dateValue(b):sort==='rating'?(Number(entry(data,videoId(b)).rating)-Number(entry(data,videoId(a)).rating)||dateValue(b)-dateValue(a)):dateValue(b)-dateValue(a));
+list.sort((a,b)=>{if(sort==='oldest')return dateValue(a)-dateValue(b);if(sort==='rating')return (Number(entry(data,videoId(b)).rating)-Number(entry(data,videoId(a)).rating))||dateValue(b)-dateValue(a);return dateValue(b)-dateValue(a);});
 root.innerHTML=list.length?list.map(v=>renderCard(v)).join(''):'<div class="empty">'+(showFavorites?'Zatím nemáš žádná oblíbená videa. Přidej je kliknutím na ♡.':term?'Tomuto hledání neodpovídá žádné video.':'Žádná videa nejsou dostupná.')+'</div>';
 }
 async function load(){if(loading)return;loading=true;const button=document.getElementById('refresh');button.disabled=true;status.textContent='● Načítám novinky…';
