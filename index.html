@@ -228,6 +228,7 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
 @media(prefers-reduced-motion:reduce){.avatar-aura{animation:none}}
 
 
+.avatar-fallback{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:2}.avatar-fallback .avatar-figure{transform:scale(1.05);transform-origin:center center}
 /* TRUE 3D AVATAR VIEWPORT */
 .avatar-3d-stage{position:absolute;inset:0 0 42px;overflow:hidden;touch-action:pan-y;cursor:grab;background:radial-gradient(ellipse at 50% 75%,#4aaeff30,transparent 42%),linear-gradient(180deg,#172e50 0%,#101b32 56%,#090f1d 100%)}
 .avatar-3d-stage:active{cursor:grabbing}
@@ -818,6 +819,16 @@ for(const [label,fn] of [['playlist',syncPlaylistUI],['profile',applyProfile],['
  try{fn()}catch(error){console.error('XMP '+label+' init failed:',error);const statusEl=document.getElementById('status');if(statusEl)statusEl.textContent='● Chyba modulu '+label+': '+String(error.message||error).slice(0,120);}
 }
 setInterval(()=>{try{load()}catch(error){console.error('XMP refresh failed:',error)}},300000);
+function showAvatarFallback(){
+ const make=()=>'<div class="avatar-fallback"><div class="avatar-figure"><div class="avatar-gear">⚡</div><div class="avatar-head"><i class="avatar-eye left"></i><i class="avatar-eye right"></i><i class="avatar-mouth"></i></div><div class="avatar-body"></div><div class="avatar-arm left"></div><div class="avatar-arm right"></div><div class="avatar-leg left"></div><div class="avatar-leg right"></div></div></div>';
+ for(const id of ['avatar-3d-stage','hero-character-stage']){
+  const host=document.getElementById(id);if(!host)continue;
+  let fallback=host.querySelector('.avatar-fallback');
+  if(!fallback){host.insertAdjacentHTML('beforeend',make());}
+ }
+ const loading=document.getElementById('avatar-3d-loading');
+ if(loading)loading.textContent='3D není dostupné – zobrazuji náhradního avatara.';
+}
 function startXmp3D(){
  try{
   if(!window.THREE)throw new Error('Three.js není dostupný');
@@ -825,28 +836,30 @@ function startXmp3D(){
   initLobbyAvatar();
   initAvatarStudio();
   if(!xmp3d.renderer)throw new Error('3D renderer se nepodařilo vytvořit');
+  document.querySelectorAll('.avatar-fallback').forEach(el=>el.remove());
  }catch(error){
   console.error('XMP avatar init failed:',error);
   const note=document.getElementById('avatar-3d-loading');
-  if(note)note.textContent='Panáček se nepodařil načíst. Zkouším náhradní načtení…';
+  if(note)note.textContent='3D se nepodařilo spustit. Zobrazuji náhradního avatara.';
+  showAvatarFallback();
   return false;
  }
  return true;
 }
 function loadThreeFallback(){
  if(window.THREE){if(!startXmp3D())loadThreeBackup();return;}
- const urls=['https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];
+ const urls=['https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js','https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];
  let index=0;
  function attempt(){
   if(window.THREE){startXmp3D();return;}
-  if(index>=urls.length){const note=document.getElementById('avatar-3d-loading');if(note)note.textContent='3D knihovna není dostupná. Zkontroluj připojení nebo blokování skriptů.';return;}
+  if(index>=urls.length){showAvatarFallback();return;}
   const script=document.createElement('script');script.src=urls[index++];script.onload=()=>{if(!startXmp3D())attempt()};script.onerror=attempt;document.head.appendChild(script);
  }
  attempt();
 }
 function loadThreeBackup(){
  const urls=['https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];
- let i=0;function next(){if(window.THREE){startXmp3D();return;}if(i>=urls.length){const note=document.getElementById('avatar-3d-loading');if(note)note.textContent='3D se nepodařilo načíst. Zkus obnovit stránku (Ctrl + F5).';return;}const sc=document.createElement('script');sc.src=urls[i++];sc.onload=startXmp3D;sc.onerror=next;document.head.appendChild(sc)}next();
+ let i=0;function next(){if(window.THREE){startXmp3D();return;}if(i>=urls.length){showAvatarFallback();return;}const sc=document.createElement('script');sc.src=urls[i++];sc.onload=startXmp3D;sc.onerror=next;document.head.appendChild(sc)}next();
 }
 if(document.readyState==='complete')loadThreeFallback();else window.addEventListener('load',loadThreeFallback,{once:true});
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
