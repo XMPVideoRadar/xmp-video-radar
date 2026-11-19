@@ -81,6 +81,12 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
 @media(max-width:700px){.avatar-layout{grid-template-columns:1fr}.avatar-preview{min-height:270px}.avatar-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.avatar-figure{animation:none}}
 
+
+/* HOTFIX — welcome screen click reliability */
+.welcome-box:before,.welcome-box:after{pointer-events:none!important}
+.welcome-btn{position:relative;z-index:20;pointer-events:auto;touch-action:manipulation}
+.welcome{pointer-events:auto}
+
 </style>
 </head>
 <body>
@@ -170,7 +176,9 @@ function heartBurst(){for(let i=0;i<12;i++){const h=document.createElement('span
 function playUiSound(){if(!soundEnabled)return;try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=new C(),osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.setValueAtTime(660,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(990,ctx.currentTime+.12);gain.gain.setValueAtTime(.045,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.18);osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+.19);osc.onended=()=>ctx.close()}catch{}}
 document.getElementById('save-profile')?.addEventListener('click',()=>{const value=document.getElementById('profile-name').value.trim().slice(0,24)||'Jan';try{localStorage.setItem(profileKey,value)}catch{}applyProfile();heartBurst()});
 document.getElementById('sound-toggle')?.addEventListener('click',event=>{soundEnabled=!soundEnabled;event.currentTarget.textContent=soundEnabled?'🔊 Zvuky zapnuté':'🔇 Zvuky vypnuté';event.currentTarget.setAttribute('aria-pressed',String(soundEnabled));playUiSound()});
-document.getElementById('welcome-enter')?.addEventListener('click',()=>{document.getElementById('welcome')?.classList.add('hide');heartBurst()});
+function dismissWelcome(){const screen=document.getElementById('welcome');if(screen&&!screen.classList.contains('hide')){screen.classList.add('hide');heartBurst();}}
+document.getElementById('welcome-enter')?.addEventListener('click',dismissWelcome);
+document.getElementById('welcome')?.addEventListener('click',event=>{if(event.target===event.currentTarget||event.target.closest('.welcome-box'))dismissWelcome();});
 document.addEventListener('click',event=>{if(event.target.closest('button'))playUiSound()});
 function exportBackup(){const payload={format:'xmp-radar-backup',version:1,exportedAt:new Date().toISOString(),profile:getProfileName(),data:readSaved()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='xmp-radar-zaloha-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);status.textContent='● Záloha byla připravena ke stažení';}
 document.getElementById('export-backup')?.addEventListener('click',exportBackup);
