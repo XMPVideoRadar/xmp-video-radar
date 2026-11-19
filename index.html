@@ -348,6 +348,33 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
 .hero{padding-top:32px}
 @media(max-width:600px){.hero-xmp{font-size:62px;padding:10px 24px 16px}.xmp-logo:before,.hero-xmp:before{inset:-10% -6%}}
 
+
+/* XMP LOBBY BACKGROUND — subtle painted brick wall */
+body{
+ background-color:#090b13;
+ background-image:
+  radial-gradient(ellipse at 16% 18%,#f4cf1820 0,transparent 25%),
+  radial-gradient(ellipse at 83% 30%,#e52d3b20 0,transparent 27%),
+  radial-gradient(ellipse at 54% 83%,#236bdb22 0,transparent 32%),
+  linear-gradient(180deg,#090b13d9,#090b13ed),
+  repeating-linear-gradient(0deg,transparent 0 39px,#05070c 40px 43px),
+  repeating-linear-gradient(90deg,#25232a 0 78px,#080a10 79px 83px,#30262a 84px 86px);
+ background-attachment:fixed;
+}
+body:before{
+ content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.22;
+ background:
+  radial-gradient(ellipse at 8% 22%,#ffd51b 0 2px,transparent 3px),
+  radial-gradient(ellipse at 12% 25%,#e5323c 0 3px,transparent 4px),
+  radial-gradient(ellipse at 88% 62%,#2475ed 0 3px,transparent 4px),
+  radial-gradient(ellipse at 84% 66%,#ffd51b 0 2px,transparent 3px);
+ background-size:170px 140px,230px 190px,190px 170px,260px 210px;
+}
+header,.video,.playlist-panel,.quest-panel,.avatar-studio,.community-panel,.profile-panel,.stat-box,.top10-item{
+ backdrop-filter:blur(3px);
+}
+main.wrap{position:relative}
+
 </style>
 </head>
 <body>
