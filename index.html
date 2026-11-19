@@ -371,25 +371,47 @@ function buildXmpHero(def,palette,gear,index){
  const box=(p,w,h,d,m,x,y,z,rx=0,ry=0,rz=0)=>addMesh(p,new THREE.BoxGeometry(w,h,d),m,x,y,z,rx,ry,rz);
  const sphere=(p,r,m,x,y,z,sx=1,sy=1,sz=1)=>{const o=addMesh(p,new THREE.SphereGeometry(r,24,16),m,x,y,z);o.scale.set(sx,sy,sz);return o};
  const limb=(p,a,b,r1,r2,m)=>{const start=new THREE.Vector3(...a),end=new THREE.Vector3(...b),dir=end.clone().sub(start),mesh=addMesh(p,new THREE.CylinderGeometry(r2,r1,dir.length(),12),m,...start.clone().add(end).multiplyScalar(.5).toArray());mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());sphere(p,r1,m,...a);sphere(p,r2,m,...b);return mesh};
- // Battle-royale proportions: broad shoulders, compact waist, chunky boots.
- box(root,.78,.9,.42,suit,0,1.78,0);
- box(root,.83,.2,.46,trim,0,2.1,0);
- box(root,.65,.16,.47,dark,0,1.31,0);
+ // Stylized high-quality battle-royale hero: shaped torso, fitted waist and layered armor.
+ const torso=addMesh(root,new THREE.CapsuleGeometry(.34,.48,8,18),suit,0,1.78,0);torso.scale.set(1.08,1.08,.72);
+ box(root,.58,.2,.39,dark,0,1.34,0);
  box(root,.24,.25,.49,metal,0,1.48,.015);
- // chest armor plates
- box(root,.54,.42,.055,trim,0,1.83,.237);
- box(root,.43,.3,.065,suit,0,1.83,.275);
- sphere(root,.075,glow,0,1.85,.32,1,1,0.5);
- // neck and head
- limb(root,[0,2.15,0],[0,2.31,0],.13,.13,skin);
- sphere(root,.36,skin,0,2.62,0,.91,1.08,.88);
- // jawline / face mask and eyes
- box(root,.43,.17,.035,gear==='🕶️'?glow:dark,0,2.48,.31);
- box(root,.14,.045,.025,glow,-.105,2.66,.319);
- box(root,.14,.045,.025,glow,.105,2.66,.319);
- // headwear varies by rarity index
- if(index%5===2||index%5===4||index>=10){const hood=addMesh(root,new THREE.SphereGeometry(.385,24,16,0,Math.PI*2,0,Math.PI*.58),suit,0,2.72,-.015);hood.scale.set(1,1.08,.98);box(root,.56,.09,.08,trim,0,2.39,.24);}
- else {sphere(root,.28,trim,0,2.91,-.01,1,.34,1);box(root,.5,.08,.36,trim,0,2.9,-.015);}
+ // layered chest armor with raised center emblem
+ box(root,.58,.44,.075,trim,0,1.84,.235);
+ box(root,.45,.32,.085,suit,0,1.84,.29);
+ sphere(root,.085,glow,0,1.86,.35,1,1,.55);
+ box(root,.12,.25,.045,metal,0,1.84,.35);
+ // neck and expressive human-like face
+ limb(root,[0,2.12,0],[0,2.31,0],.13,.13,skin);
+ sphere(root,.355,skin,0,2.62,0,.91,1.08,.88);
+ // ears
+ for(const side of [-1,1])sphere(root,.075,skin,side*.325,2.61,0,.7,1,.7);
+ // eyes: whites, irises, pupils and eyebrows (no black mouth visor)
+ const iris=mat(index%3===0?'#42dfff':index%3===1?'#8cffb5':'#d5a5ff',.25,.2),white=mat('#f8fbff',.05,.25),pupil=mat('#172033',.05,.25);
+ for(const side of [-1,1]){
+  sphere(root,.071,white,side*.125,2.675,.302,1.12,.78,.48);
+  sphere(root,.035,iris,side*.125,2.672,.337,1,.95,.55);
+  sphere(root,.018,pupil,side*.125,2.672,.353,1,1,.5);
+  const brow=box(root,.15,.035,.035,dark,side*.125,2.765,.306,0,0,side*-.12);
+ }
+ // small nose bridge and nose tip
+ sphere(root,.045,skin,0,2.59,.319,.8,1.25,.8);
+ sphere(root,.055,skin,0,2.555,.335,1,.72,.72);
+ // natural smile, built as a curved tube on the face
+ const smilePath=new THREE.CatmullRomCurve3([new THREE.Vector3(-.085,2.49,.326),new THREE.Vector3(-.045,2.472,.347),new THREE.Vector3(0,2.468,.35),new THREE.Vector3(.045,2.472,.347),new THREE.Vector3(.085,2.49,.326)]);
+ addMesh(root,new THREE.TubeGeometry(smilePath,16,.012,8,false),mat('#713d39',.02,.72),0,0,0);
+ // hairstyle / hood silhouettes vary by hero rarity
+ if(index%5===2||index%5===4||index>=10){
+  const hood=addMesh(root,new THREE.SphereGeometry(.385,32,20,0,Math.PI*2,0,Math.PI*.58),suit,0,2.72,-.015);hood.scale.set(1,1.08,.98);
+  box(root,.56,.09,.08,trim,0,2.39,.24);
+ }else{
+  const hair=mat(index%3===0?'#263247':index%3===1?'#37243e':'#252a35',.12,.72);
+  sphere(root,.29,hair,0,2.89,-.035,1,.42,.95);
+  box(root,.5,.1,.36,trim,0,2.9,-.015);
+  sphere(root,.16,hair,-.19,2.79,.16,1,.7,.8);
+ }
+ if(gear==='🕶️'){
+  for(const side of [-1,1]){box(root,.17,.085,.035,dark,side*.125,2.675,.365);box(root,.07,.07,.04,glow,side*.125,2.675,.39)}
+ }
  // arms with shoulder pads, forearm armor and gloves
  for(const side of [-1,1]){
   limb(root,[side*.43,2.02,0],[side*.61,1.52,0],.17,.125,suit);
