@@ -235,6 +235,49 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
 .avatar-3d-loading{position:absolute;inset:0;display:grid;place-items:center;color:#d9f6ff;font-weight:800;letter-spacing:2px;text-shadow:0 2px 12px #000;pointer-events:none}
 .avatar-3d-hint{position:absolute;bottom:8px;left:0;right:0;text-align:center;color:#b8d7f0;font-size:9px;font-weight:900;letter-spacing:1.4px;text-shadow:0 2px 5px #000;pointer-events:none}
 
+
+/* XMP SPRAY-PAINT GRAFFITI LOGO */
+.logo{
+  position:relative;isolation:isolate;width:62px;height:48px;flex:0 0 62px;
+  border-radius:8px;background:transparent;color:#f8fdff;
+  font-family:Impact,"Arial Black",system-ui,sans-serif;font-size:23px;
+  font-style:italic;font-weight:1000;letter-spacing:-3px;
+  transform:rotate(-7deg) skew(-7deg);
+  -webkit-text-stroke:1px #e8fbff;
+  text-shadow:2px 2px 0 #087eae,4px 4px 0 #ff4fd8,-2px -1px 0 #55e6ff,
+    0 0 12px #55e6ff,0 0 22px #ff4fd877;
+  filter:drop-shadow(0 3px 2px #000);
+  box-shadow:none
+}
+.logo:before{
+  content:"";position:absolute;z-index:-1;inset:1px -5px;
+  background:
+    radial-gradient(circle at 8% 18%,#55e6ff 0 2px,transparent 3px),
+    radial-gradient(circle at 94% 22%,#ff4fd8 0 3px,transparent 4px),
+    radial-gradient(circle at 15% 88%,#55e6ff 0 2px,transparent 3px),
+    radial-gradient(circle at 88% 84%,#ff4fd8 0 2px,transparent 3px);
+  filter:blur(1px)
+}
+.xmp-logo{
+  font-family:Impact,"Arial Black",system-ui,sans-serif;
+  font-style:italic;font-weight:1000;letter-spacing:-.13em;
+  transform:rotate(-4deg) skew(-5deg);
+  -webkit-text-stroke:2px #eafcff;
+  text-shadow:4px 4px 0 #087eae,8px 7px 0 #ff4fd8,
+    -3px -2px 0 #55e6ff,0 0 22px #55e6ff88;
+  filter:drop-shadow(0 8px 5px #0008)
+}
+.xmp-logo:before{
+  content:"";position:absolute;z-index:-1;inset:-18% -9%;
+  background:
+    radial-gradient(circle at 5% 25%,#55e6ff 0 3px,transparent 5px),
+    radial-gradient(circle at 12% 78%,#ff4fd8 0 4px,transparent 6px),
+    radial-gradient(circle at 91% 19%,#ff4fd8 0 5px,transparent 7px),
+    radial-gradient(circle at 96% 76%,#55e6ff 0 3px,transparent 5px),
+    radial-gradient(ellipse at 50% 50%,#55e6ff18,transparent 65%);
+  pointer-events:none
+}
+
 </style>
 </head>
 <body>
