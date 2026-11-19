@@ -405,28 +405,64 @@ function buildXmpHero(def,palette,gear,index){
   box(root,.56,.09,.08,trim,0,2.39,.24);
  }else{
   const hair=mat(index%3===0?'#263247':index%3===1?'#37243e':'#252a35',.12,.72);
-  sphere(root,.29,hair,0,2.89,-.035,1,.42,.95);
-  box(root,.5,.1,.36,trim,0,2.9,-.015);
-  sphere(root,.16,hair,-.19,2.79,.16,1,.7,.8);
+  // swept hair cap, fringe and side locks instead of a flat helmet band
+  sphere(root,.29,hair,0,2.88,-.055,1,.42,.98);
+  sphere(root,.2,hair,-.17,2.79,.13,1,.72,.8);
+  sphere(root,.18,hair,.16,2.81,.1,1,.7,.8);
+  const fringe=addMesh(root,new THREE.SphereGeometry(.22,20,12),hair,.015,2.79,.245);fringe.scale.set(1.25,.48,.42);
+  for(let spike=0;spike<3;spike++){const tuft=addMesh(root,new THREE.ConeGeometry(.075,.2,8),hair,-.13+spike*.13,2.98+(spike===1?.035:0),-.015,0,0,(spike-1)*.22);}
  }
  if(gear==='🕶️'){
   for(const side of [-1,1]){box(root,.17,.085,.035,dark,side*.125,2.675,.365);box(root,.07,.07,.04,glow,side*.125,2.675,.39)}
  }
- // arms with shoulder pads, forearm armor and gloves
+ // Sculpted arms, layered shoulder armor, gloves and forearm tech
  for(const side of [-1,1]){
   limb(root,[side*.43,2.02,0],[side*.61,1.52,0],.17,.125,suit);
-  sphere(root,.22,trim,side*.48,2.02,0,1,.72,1);
-  limb(root,[side*.61,1.52,0],[side*.65,1.15,.02],.13,.105,metal);
+  sphere(root,.225,trim,side*.48,2.02,0,1,.72,1);
+  sphere(root,.125,metal,side*.48,2.02,.16,1,.8,.42);
+  box(root,.105,.17,.035,glow,side*.48,2.02,.222);
+  limb(root,[side*.61,1.52,0],[side*.65,1.15,.02],.13,.105,suit);
   sphere(root,.14,dark,side*.65,1.1,.02,1,.72,1);
   box(root,.19,.3,.22,trim,side*.61,1.48,.02,0,0,side*.12);
+  box(root,.15,.09,.24,metal,side*.65,1.31,.03);
+  box(root,.12,.045,.04,glow,side*.65,1.31,.16);
+  // articulated gloves and knuckle guards
+  sphere(root,.13,dark,side*.65,1.08,.04,1,.85,1.05);
+  for(let k=0;k<3;k++)box(root,.045,.07,.045,metal,side*.65+(k-1)*.065,1.04,.15);
+  // upper-arm insignia and utility strap
+  box(root,.19,.075,.19,dark,side*.55,1.72,.02,0,0,side*.12);
+  box(root,.11,.045,.2,glow,side*.55,1.72,.12,0,0,side*.12);
  }
- // legs, knee guards and heavy boots
+ // fitted tactical trousers, knee guards, shin plates and detailed boots
  for(const side of [-1,1]){
   limb(root,[side*.2,1.28,0],[side*.23,.66,0],.19,.145,suit);
+  box(root,.22,.28,.12,dark,side*.23,1.05,.12,0,0,side*.08);
   sphere(root,.17,trim,side*.23,.76,.14,1,.75,.55);
-  limb(root,[side*.23,.66,0],[side*.24,.34,0],.145,.13,dark);
-  box(root,.32,.2,.48,metal,side*.24,.19,.1);
+  box(root,.2,.13,.055,metal,side*.23,.76,.205);
+  limb(root,[side*.23,.66,0],[side*.24,.34,0],.145,.13,suit);
+  box(root,.2,.38,.07,trim,side*.24,.49,.14,side*-.04,0,0);
+  box(root,.13,.24,.035,metal,side*.24,.49,.19);
+  box(root,.32,.2,.48,dark,side*.24,.19,.1);
   box(root,.29,.12,.43,trim,side*.24,.27,.12);
+  box(root,.22,.045,.035,metal,side*.24,.31,.34);
+  for(let lace=0;lace<3;lace++)box(root,.13,.018,.018,glow,side*.24,.22+lace*.035,.35);
+ }
+ // belt, buckle and utility pouches
+ box(root,.72,.13,.46,dark,0,1.38,.015);
+ box(root,.17,.17,.055,metal,0,1.38,.255);
+ box(root,.085,.085,.025,glow,0,1.38,.291);
+ for(const side of [-1,1]){
+  box(root,.17,.22,.17,trim,side*.39,1.39,.02);
+  box(root,.12,.07,.19,dark,side*.39,1.47,.02);
+  box(root,.07,.12,.025,metal,side*.39,1.39,.115);
+  // thigh straps and side holster
+  box(root,.16,.07,.22,dark,side*.27,.98,.015,0,0,side*.08);
+ }
+ // chest harness, shoulder seams and small armor rivets
+ for(const side of [-1,1]){
+  const strap=box(root,.075,.58,.035,metal,side*.2,1.82,.34,0,0,side*-.22);
+  box(root,.11,.09,.045,glow,side*.2,1.91,.37);
+  for(let rivet=0;rivet<3;rivet++)sphere(root,.018,metal,side*.25,1.7+rivet*.12,.34);
  }
  // backpack / back bling
  box(root,.48,.68,.2,dark,0,1.75,-.32);
