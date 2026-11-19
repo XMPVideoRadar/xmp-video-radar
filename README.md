@@ -26,3 +26,14 @@ YouTube RSS běžně poskytuje pouze omezený počet posledních položek, nikol
 Stránka neodesílá komentáře ani hodnocení na vlastní server. Ukládá je do místního úložiště prohlížeče. Sdílení webu se spouští až po kliknutí návštěvníka.
 
 Neoficiální fanouškovský projekt. Videa a jejich obsah patří jejich autorovi.
+
+
+## XMP 5.1 — profil, TOP 10 a efekty
+- Upravitelný lokální profil se jménem a osobním pozdravem.
+- TOP 10 žebříček podle místního hodnocení.
+- Přepínatelné krátké zvukové efekty (ve výchozím stavu vypnuté).
+- Animované srdíčkové efekty, třpytky a zachované omezení animací pro uživatele s nastavením `prefers-reduced-motion`.
+- Zachováno načítání 20 posledních videí a automatické obnovení po 5 minutách.
+
+## Sdílená databáze (příprava)
+Soubor `supabase.sql` připravuje tabulky pro společná hodnocení, komentáře a oblíbená videa s Row Level Security. **Databáze zatím není připojena k webu**: k aktivaci je nutné vytvořit Supabase projekt, spustit SQL v SQL Editoru a doplnit veřejnou Project URL a anon/publishable key spolu s přihlášením uživatelů. Tajný `service_role` klíč se nikdy nesmí vložit do webu ani repozitáře. Do té doby zůstávají interakce lokální v prohlížeči.
