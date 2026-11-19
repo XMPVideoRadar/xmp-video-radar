@@ -252,7 +252,7 @@ main.wrap{padding-top:10px}.toolbar{display:flex;justify-content:space-between;a
   </div>
   <div class="avatar-controls">
    <div><label>VYBER SI SVÉHO HRDINU</label><div class="note" id="avatar-unlock-info">Avataři se odemykají postupně podle levelu.</div><div class="avatar-grid" id="avatar-grid"></div></div>
-   <div><label for="avatar-color">BARVA VÝBAVY</label><select class="avatar-select" id="avatar-color"><option value="cyan">Neon cyan</option><option value="purple">Cyber purple</option><option value="red">Flame red</option><option value="green">Toxic green</option><option value="gold">Royal gold</option><option value="pink">Hot pink</option></select></div>
+   <div><label for="avatar-color">BARVA VÝBAVY</label><select class="avatar-select" id="avatar-color"><option value="skin">Originální barvy skinu</option><option value="cyan">Neon cyan</option><option value="purple">Cyber purple</option><option value="red">Flame red</option><option value="green">Toxic green</option><option value="gold">Royal gold</option><option value="pink">Hot pink</option></select></div>
    <div><label for="avatar-accessory">DOPLNĚK</label><select class="avatar-select" id="avatar-accessory"><option value="🎧">Gaming sluchátka 🎧</option><option value="👑">Královská koruna 👑</option><option value="🕶️">Cyber brýle 🕶️</option><option value="⚡">Energetický blesk ⚡</option><option value="😈">Démonické rohy 😈</option><option value="🚀">Rocket helma 🚀</option><option value="✨">Hvězdná aura ✨</option></select></div>
    <div class="avatar-command"><label for="avatar-command-input">⌨️ XMP COMMAND LINE</label><div class="command-row"><input id="avatar-command-input" class="avatar-select" type="text" placeholder="/level 100" autocomplete="off"><button class="btn" id="avatar-command-run" type="button">RUN</button></div><p class="note" id="avatar-command-output">Zadej příkaz, například /level 100.</p></div>
    <div class="avatar-footer"><span class="subtle" id="avatar-rarity">RARE · XMP EXPLORER</span><button class="btn" id="save-avatar" type="button">💾 Uložit avatara</button></div>
@@ -338,36 +338,81 @@ document.getElementById('backup-file')?.addEventListener('change',async event=>{
 
 /* XMP 8.0 — locally saved 3D avatar studio */
 const avatarDefs=[
- {name:'XMP Rookie',rarity:'COMMON',className:'common',suit:'#477bd4',trim:'#55e6ff',gear:'🎧'},
- {name:'Neon Runner',rarity:'UNCOMMON',className:'uncommon',suit:'#12a8a8',trim:'#8affdf',gear:'⚡'},
- {name:'Shadow Ninja',rarity:'RARE',className:'rare',suit:'#30364d',trim:'#a18aff',gear:'😈'},
- {name:'Frost Byte',rarity:'EPIC',className:'epic',suit:'#347cae',trim:'#c7f7ff',gear:'🕶️'},
- {name:'Toxic Hacker',rarity:'LEGENDARY',className:'legendary',suit:'#397b42',trim:'#a5ff54',gear:'🚀'},
- {name:'Flame Beast',rarity:'MYTHIC',className:'mythic',suit:'#a52d38',trim:'#ff9b43',gear:'😈'},
- {name:'Cyber Knight',rarity:'SECRET',className:'secret',suit:'#4a3d91',trim:'#c6a1ff',gear:'👑'},
- {name:'Galaxy Pilot',rarity:'GOD',className:'god',suit:'#273a78',trim:'#ff69dc',gear:'🚀'},
- {name:'Jade Guardian',rarity:'QUANTITY',className:'quantity',suit:'#176b5b',trim:'#74ffd0',gear:'✨'},
- {name:'Golden Legend',rarity:'CELESTIAL',className:'celestial',suit:'#9a6a13',trim:'#ffe17a',gear:'👑'},
- {name:'Void Emperor',rarity:'CELESTIAL+',className:'celestial-plus',suit:'#38205f',trim:'#e78aff',gear:'😈'},
- {name:'XMP Overlord',rarity:'ETERNAL',className:'eternal',suit:'#8e245e',trim:'#ff8fd7',gear:'⚡'},
- {name:'Eternal Warden',rarity:'ETERNAL+',className:'eternal-plus',suit:'#174b58',trim:'#76fff2',gear:'🛡️'},
- {name:'OG Legend',rarity:'OG',className:'og',suit:'#5b4320',trim:'#ffd78a',gear:'👑'},
- {name:'XMP Extreme OG',rarity:'EXTREME OG',className:'extreme-og',suit:'#17152e',trim:'#ff3df2',gear:'💠'},
- {name:'Blue Recruit',rarity:'COMMON',className:'common',suit:'#315b9d',trim:'#b8eaff',gear:'🛡️'},
- {name:'Pulse Sprinter',rarity:'UNCOMMON',className:'uncommon',suit:'#087c75',trim:'#b1ffe9',gear:'⚡'},
- {name:'Phantom Operative',rarity:'RARE',className:'rare',suit:'#24243d',trim:'#bd9cff',gear:'😈'},
- {name:'Arctic Striker',rarity:'EPIC',className:'epic',suit:'#286b9c',trim:'#e2ffff',gear:'🛡️'},
- {name:'Biohazard Agent',rarity:'LEGENDARY',className:'legendary',suit:'#285b31',trim:'#d2ff48',gear:'☣️'},
- {name:'Magma Titan',rarity:'MYTHIC',className:'mythic',suit:'#75202a',trim:'#ffc04a',gear:'😈'},
- {name:'Cipher Sentinel',rarity:'SECRET',className:'secret',suit:'#30256e',trim:'#e2baff',gear:'🛡️'},
- {name:'Nebula Ranger',rarity:'GOD',className:'god',suit:'#202b60',trim:'#ff9be8',gear:'🚀'},
- {name:'Emerald Colossus',rarity:'QUANTITY',className:'quantity',suit:'#104c40',trim:'#a2ffdc',gear:'✨'},
- {name:'Solar Champion',rarity:'CELESTIAL',className:'celestial',suit:'#80520b',trim:'#fff0a8',gear:'👑'},
- {name:'Abyss Monarch',rarity:'CELESTIAL+',className:'celestial-plus',suit:'#291344',trim:'#f3a5ff',gear:'😈'},
- {name:'Starlight Reaper',rarity:'ETERNAL',className:'eternal',suit:'#651442',trim:'#ffb5e7',gear:'⚡'},
- {name:'Prism Warden',rarity:'ETERNAL+',className:'eternal-plus',suit:'#123d49',trim:'#a8fff8',gear:'🛡️'},
- {name:'OG Renegade',rarity:'OG',className:'og',suit:'#463316',trim:'#ffe5a4',gear:'👑'},
- {name:'XMP Ultra OG',rarity:'EXTREME OG',className:'extreme-og',suit:'#100d22',trim:'#ff78f7',gear:'💠'}
+ {name:"XMP Rookie",rarity:"COMMON",className:"common",suit:"#477bd4",trim:"#55e6ff",gear:"🎧"},
+ {name:"Blue Recruit",rarity:"COMMON",className:"common",suit:"#315b9d",trim:"#b8eaff",gear:"🛡️"},
+ {name:"Pixel Cadet",rarity:"COMMON",className:"common",suit:"#45627a",trim:"#b4d7ed",gear:"🎮"},
+ {name:"Street Scout",rarity:"COMMON",className:"common",suit:"#536b89",trim:"#e3b978",gear:"🧢"},
+ {name:"Rookie Spark",rarity:"COMMON",className:"common",suit:"#287e9b",trim:"#7df4ff",gear:"⚡"},
+ {name:"Neon Runner",rarity:"UNCOMMON",className:"uncommon",suit:"#12a8a8",trim:"#8affdf",gear:"⚡"},
+ {name:"Pulse Sprinter",rarity:"UNCOMMON",className:"uncommon",suit:"#087c75",trim:"#b1ffe9",gear:"⚡"},
+ {name:"Circuit Breaker",rarity:"UNCOMMON",className:"uncommon",suit:"#326b8b",trim:"#7ddcff",gear:"🔋"},
+ {name:"Turbo Shift",rarity:"UNCOMMON",className:"uncommon",suit:"#177f9b",trim:"#d4ff58",gear:"🏁"},
+ {name:"Volt Skater",rarity:"UNCOMMON",className:"uncommon",suit:"#3a8b83",trim:"#a5ffd5",gear:"🛹"},
+ {name:"Shadow Ninja",rarity:"RARE",className:"rare",suit:"#30364d",trim:"#a18aff",gear:"😈"},
+ {name:"Phantom Operative",rarity:"RARE",className:"rare",suit:"#24243d",trim:"#bd9cff",gear:"😈"},
+ {name:"Night Stalker",rarity:"RARE",className:"rare",suit:"#292d4a",trim:"#8c9bff",gear:"🗡️"},
+ {name:"Crimson Specter",rarity:"RARE",className:"rare",suit:"#642c4c",trim:"#ff83ae",gear:"👁️"},
+ {name:"Dusk Phantom",rarity:"RARE",className:"rare",suit:"#34304f",trim:"#d4a2ff",gear:"🌙"},
+ {name:"Frost Byte",rarity:"EPIC",className:"epic",suit:"#347cae",trim:"#c7f7ff",gear:"🕶️"},
+ {name:"Arctic Striker",rarity:"EPIC",className:"epic",suit:"#286b9c",trim:"#e2ffff",gear:"🛡️"},
+ {name:"Glacier Guard",rarity:"EPIC",className:"epic",suit:"#3d83a4",trim:"#b5f1ff",gear:"❄️"},
+ {name:"Storm Caster",rarity:"EPIC",className:"epic",suit:"#3e5796",trim:"#b7c8ff",gear:"🌩️"},
+ {name:"Crystal Vanguard",rarity:"EPIC",className:"epic",suit:"#4775a8",trim:"#d9caff",gear:"💎"},
+ {name:"Toxic Hacker",rarity:"LEGENDARY",className:"legendary",suit:"#397b42",trim:"#a5ff54",gear:"🚀"},
+ {name:"Biohazard Agent",rarity:"LEGENDARY",className:"legendary",suit:"#285b31",trim:"#d2ff48",gear:"☣️"},
+ {name:"Venom Protocol",rarity:"LEGENDARY",className:"legendary",suit:"#28523a",trim:"#8dff8a",gear:"🧪"},
+ {name:"Radioactive Rogue",rarity:"LEGENDARY",className:"legendary",suit:"#4b7024",trim:"#e1ff52",gear:"☢️"},
+ {name:"Jungle Enforcer",rarity:"LEGENDARY",className:"legendary",suit:"#315d38",trim:"#d4c66b",gear:"🌿"},
+ {name:"Flame Beast",rarity:"MYTHIC",className:"mythic",suit:"#a52d38",trim:"#ff9b43",gear:"😈"},
+ {name:"Magma Titan",rarity:"MYTHIC",className:"mythic",suit:"#75202a",trim:"#ffc04a",gear:"🔥"},
+ {name:"Inferno Breaker",rarity:"MYTHIC",className:"mythic",suit:"#852f25",trim:"#ffcf55",gear:"🔥"},
+ {name:"Solar Fury",rarity:"MYTHIC",className:"mythic",suit:"#9b4825",trim:"#ffe27b",gear:"☀️"},
+ {name:"Ashen Dragon",rarity:"MYTHIC",className:"mythic",suit:"#60323a",trim:"#ff9a68",gear:"🐉"},
+ {name:"Cyber Knight",rarity:"SECRET",className:"secret",suit:"#4a3d91",trim:"#c6a1ff",gear:"👑"},
+ {name:"Cipher Sentinel",rarity:"SECRET",className:"secret",suit:"#30256e",trim:"#e2baff",gear:"🛡️"},
+ {name:"Glitch Assassin",rarity:"SECRET",className:"secret",suit:"#29224f",trim:"#ff62d6",gear:"🗡️"},
+ {name:"Quantum Ronin",rarity:"SECRET",className:"secret",suit:"#3e3578",trim:"#7cf7ff",gear:"⚔️"},
+ {name:"Obsidian Agent",rarity:"SECRET",className:"secret",suit:"#292d42",trim:"#c3d0ff",gear:"🕶️"},
+ {name:"Galaxy Pilot",rarity:"GOD",className:"god",suit:"#273a78",trim:"#ff69dc",gear:"🚀"},
+ {name:"Nebula Ranger",rarity:"GOD",className:"god",suit:"#202b60",trim:"#ff9be8",gear:"🚀"},
+ {name:"Cosmic Drifter",rarity:"GOD",className:"god",suit:"#263b70",trim:"#8fe9ff",gear:"🌌"},
+ {name:"Stellar Commander",rarity:"GOD",className:"god",suit:"#393078",trim:"#ffd2ff",gear:"🪐"},
+ {name:"Nova Striker",rarity:"GOD",className:"god",suit:"#4b347f",trim:"#ffb5a8",gear:"☄️"},
+ {name:"Jade Guardian",rarity:"QUANTITY",className:"quantity",suit:"#176b5b",trim:"#74ffd0",gear:"✨"},
+ {name:"Emerald Colossus",rarity:"QUANTITY",className:"quantity",suit:"#104c40",trim:"#a2ffdc",gear:"✨"},
+ {name:"Verdant Titan",rarity:"QUANTITY",className:"quantity",suit:"#1c6650",trim:"#c1ff78",gear:"🌱"},
+ {name:"Prism Keeper",rarity:"QUANTITY",className:"quantity",suit:"#176b75",trim:"#a6fff4",gear:"💠"},
+ {name:"Aqua Monarch",rarity:"QUANTITY",className:"quantity",suit:"#155b78",trim:"#81eaff",gear:"👑"},
+ {name:"Golden Legend",rarity:"CELESTIAL",className:"celestial",suit:"#9a6a13",trim:"#ffe17a",gear:"👑"},
+ {name:"Solar Champion",rarity:"CELESTIAL",className:"celestial",suit:"#80520b",trim:"#fff0a8",gear:"☀️"},
+ {name:"Dawn Sovereign",rarity:"CELESTIAL",className:"celestial",suit:"#9c6820",trim:"#ffdb9e",gear:"🌅"},
+ {name:"Astral Emperor",rarity:"CELESTIAL",className:"celestial",suit:"#876021",trim:"#fff2b0",gear:"🌟"},
+ {name:"Heavenforge Hero",rarity:"CELESTIAL",className:"celestial",suit:"#9a772c",trim:"#fff6d2",gear:"🪽"},
+ {name:"Void Emperor",rarity:"CELESTIAL+",className:"celestial-plus",suit:"#38205f",trim:"#e78aff",gear:"😈"},
+ {name:"Abyss Monarch",rarity:"CELESTIAL+",className:"celestial-plus",suit:"#291344",trim:"#f3a5ff",gear:"😈"},
+ {name:"Dark Matter King",rarity:"CELESTIAL+",className:"celestial-plus",suit:"#211a42",trim:"#b78cff",gear:"🌀"},
+ {name:"Eclipse Sovereign",rarity:"CELESTIAL+",className:"celestial-plus",suit:"#3a2055",trim:"#ff9be8",gear:"🌑"},
+ {name:"Rift Dominator",rarity:"CELESTIAL+",className:"celestial-plus",suit:"#251c63",trim:"#8deaff",gear:"🌀"},
+ {name:"XMP Overlord",rarity:"ETERNAL",className:"eternal",suit:"#8e245e",trim:"#ff8fd7",gear:"⚡"},
+ {name:"Starlight Reaper",rarity:"ETERNAL",className:"eternal",suit:"#651442",trim:"#ffb5e7",gear:"⚡"},
+ {name:"Eternal Flame",rarity:"ETERNAL",className:"eternal",suit:"#76233e",trim:"#ffb16b",gear:"🔥"},
+ {name:"Infinity Hunter",rarity:"ETERNAL",className:"eternal",suit:"#4e2768",trim:"#e2a2ff",gear:"♾️"},
+ {name:"Timebreaker",rarity:"ETERNAL",className:"eternal",suit:"#5b2852",trim:"#ff8acb",gear:"⌛"},
+ {name:"Eternal Warden",rarity:"ETERNAL+",className:"eternal-plus",suit:"#174b58",trim:"#76fff2",gear:"🛡️"},
+ {name:"Prism Warden",rarity:"ETERNAL+",className:"eternal-plus",suit:"#123d49",trim:"#a8fff8",gear:"🛡️"},
+ {name:"Chrono Guardian",rarity:"ETERNAL+",className:"eternal-plus",suit:"#24475f",trim:"#9fdcff",gear:"⏳"},
+ {name:"Infinity Sentinel",rarity:"ETERNAL+",className:"eternal-plus",suit:"#184e65",trim:"#9fffe8",gear:"♾️"},
+ {name:"Astral Bulwark",rarity:"ETERNAL+",className:"eternal-plus",suit:"#253d68",trim:"#b8c5ff",gear:"🔱"},
+ {name:"OG Legend",rarity:"OG",className:"og",suit:"#5b4320",trim:"#ffd78a",gear:"👑"},
+ {name:"OG Renegade",rarity:"OG",className:"og",suit:"#463316",trim:"#ffe5a4",gear:"👑"},
+ {name:"Classic Champion",rarity:"OG",className:"og",suit:"#68502c",trim:"#f4d18c",gear:"🏆"},
+ {name:"Retro Raider",rarity:"OG",className:"og",suit:"#59452b",trim:"#ffca78",gear:"🕹️"},
+ {name:"Original Outlaw",rarity:"OG",className:"og",suit:"#443b30",trim:"#e6d0a1",gear:"⭐"},
+ {name:"XMP Extreme OG",rarity:"EXTREME OG",className:"extreme-og",suit:"#17152e",trim:"#ff3df2",gear:"💠"},
+ {name:"XMP Ultra OG",rarity:"EXTREME OG",className:"extreme-og",suit:"#100d22",trim:"#ff78f7",gear:"💠"},
+ {name:"Eternal XMP Zero",rarity:"EXTREME OG",className:"extreme-og",suit:"#09091b",trim:"#ff40b8",gear:"♾️"},
+ {name:"Omega Overdrive",rarity:"EXTREME OG",className:"extreme-og",suit:"#21102e",trim:"#ffb4f7",gear:"☄️"},
+ {name:"Absolute Apex",rarity:"EXTREME OG",className:"extreme-og",suit:"#130d24",trim:"#f8f2ff",gear:"👑"}
 ];
 const avatarColors={cyan:['#477bd4','#55e6ff'],purple:['#5940a0','#c6a1ff'],red:['#a52d38','#ff9b43'],green:['#397b42','#a5ff54'],gold:['#9a6a13','#ffe17a'],pink:['#8e245e','#ff8fd7']};
 const avatarKey='xmp-avatar-v1';
@@ -525,12 +570,12 @@ function updateThreeAvatar(def,palette,gear,index){
 let selectedAvatar=0;
 function savedAvatar(){try{return JSON.parse(localStorage.getItem(avatarKey)||'{}')}catch{return {}}}
 function renderAvatar(){
- const def=avatarDefs[selectedAvatar]||avatarDefs[0],color=document.getElementById('avatar-color').value,gear=document.getElementById('avatar-accessory').value,palette=avatarColors[color]||avatarColors.cyan;
+ const def=avatarDefs[selectedAvatar]||avatarDefs[0],color=document.getElementById('avatar-color').value,gear=document.getElementById('avatar-accessory').value,palette=color==='skin'?[def.suit,def.trim]:(avatarColors[color]||[def.suit,def.trim]);
  updateThreeAvatar(def,palette,gear,selectedAvatar);document.getElementById('avatar-name').textContent=def.name.toUpperCase();
  document.getElementById('avatar-rarity').innerHTML='<span class="rarity-'+def.className+'">'+def.rarity+'</span> · '+esc(def.name.toUpperCase());
  document.querySelectorAll('.avatar-choice').forEach((el,i)=>el.setAttribute('aria-pressed',String(i===selectedAvatar)));
 }
-const avatarUnlockLevels=[1,10,25,50,100,200,350,500,750,1000,2500,5000,7500,9000,10000,5,20,40,75,150,300,450,650,900,1500,3000,6000,8000,9500,15000];
+const avatarUnlockLevels=[1,2,3,4,5,10,12,14,16,20,25,30,35,40,45,50,60,65,70,75,100,110,120,135,150,200,225,250,275,300,350,375,400,425,450,500,540,580,620,650,750,800,850,875,900,1000,1100,1200,1350,1500,2500,2600,2750,2900,3000,5000,5250,5500,5750,6000,7500,7600,7750,7900,8000,9000,9100,9250,9400,9500,10000,11000,12000,13500,15000];
 function currentLevel(){const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}return Math.floor((favorites*5+ratings*3+comments*2+(claimed?25:0)+getBonusXp())/100)+1}
 function isAvatarUnlocked(index){return isOwnerProfile()||currentLevel()>=avatarUnlockLevels[index]}
 function refreshAvatarUnlocks(){const level=currentLevel(),ownerMode=isOwnerProfile(),unlocked=avatarDefs.filter((a,i)=>isAvatarUnlocked(i)).length,info=document.getElementById('avatar-unlock-info');if(info)info.textContent=ownerMode?'👑 OWNER MODE · Alexander (Owner) · Všechny avatary odemčeny':'LEVEL '+level+' · Odemčeno '+unlocked+'/'+avatarDefs.length+' avatarů.';document.querySelectorAll('.avatar-choice').forEach((button,i)=>{const open=isAvatarUnlocked(i);button.disabled=!open;button.title=open?'':'Odemkneš na levelu '+avatarUnlockLevels[i];const small=button.querySelector('small');if(small)small.textContent=open?avatarDefs[i].rarity:'🔒 LEVEL '+avatarUnlockLevels[i];const mini=button.querySelector('.mini-avatar');if(mini)mini.textContent=open?'':'🔒';});if(!isAvatarUnlocked(selectedAvatar)){selectedAvatar=0;renderAvatar();}}
