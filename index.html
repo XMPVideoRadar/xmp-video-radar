@@ -657,7 +657,7 @@ function isOwnerProfile(){return getProfileName().trim().toLowerCase()==='alexan
 function updateOwnerAccessUI(){const panel=document.querySelector('.avatar-command');if(panel)panel.hidden=!isOwnerProfile();const info=document.getElementById('avatar-unlock-info');if(info&&isOwnerProfile())info.textContent='👑 OWNER MODE · Alexander (Owner) · Všechny avatary odemčeny';}
 function runAvatarCommand(){const input=document.getElementById('avatar-command-input'),output=document.getElementById('avatar-command-output');if(!isOwnerProfile()){output.textContent='⛔ Přístup odepřen. Příkazy jsou dostupné pouze profilu Alexander (Owner).';input.value='';return;}const command=input.value.trim().toLowerCase(),tokenMatch=command.match(/^\/tokens\s+(\d{1,9})$/),match=command.match(/^\/level\s+(\d{1,15})$/);if(tokenMatch){const amount=Number(tokenMatch[1]);if(!Number.isSafeInteger(amount)||amount<1){output.textContent='Zadej kladný počet tokenů, například /tokens 10.';return;}try{const current=Number(localStorage.getItem('mega10-coins'))||0;const total=Math.min(Number.MAX_SAFE_INTEGER,current+amount);localStorage.setItem('mega10-coins',String(total));const wallet=document.getElementById('mega10-tokens');if(wallet)wallet.textContent=String(total);const armorWallet=document.getElementById('armor-coins');if(armorWallet)armorWallet.textContent=String(total);output.textContent='✓ Přidáno '+amount+' tokenů. Aktuální zůstatek: '+total+' 🪙';input.value='';return}catch{output.textContent='Tokeny se nepodařilo uložit.';return}}if(match){const target=Math.max(1,Math.min(Number.MAX_SAFE_INTEGER,Number(match[1])));try{const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}const base=favorites*5+ratings*3+comments*2+(claimed?25:0);localStorage.setItem(bonusXpStorageKey(),String(Math.max(0,Math.min(Number.MAX_SAFE_INTEGER,(target-1)*100-base))));output.textContent='✓ Level nastaven na '+target+'. XP a avatary byly aktualizovány.';render();location.reload()}catch{output.textContent='Prohlížeč nedovolil uložit level.'}return}if(command==='/level reset'){try{localStorage.removeItem(bonusXpStorageKey());output.textContent='Level bonus byl resetován.';render();location.reload()}catch{output.textContent='Reset se nepodařil.'}return}output.textContent='Neznámý příkaz. Použij /tokens ČÍSLO nebo /level ČÍSLO (příkazy jen pro Owner).';}
 
-let xmp3d={renderer:null,scene:null,camera:null,root:null,aura:null,frame:0,drag:false,lastX:0,lastY:0,rotY:0,rotX:0.04,zoom:5.7};
+let xmp3dError='',xmp3d={renderer:null,scene:null,camera:null,root:null,aura:null,frame:0,drag:false,lastX:0,lastY:0,rotY:0,rotX:0.04,zoom:5.7};
 function mat(color,metalness=0.25,roughness=0.48){return new THREE.MeshStandardMaterial({color:new THREE.Color(color),metalness,roughness})}
 function addMesh(parent,geometry,material,x,y,z,rx=0,ry=0,rz=0){const m=new THREE.Mesh(geometry,material);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
 function buildXmpHero(def,palette,gear,index){
@@ -814,7 +814,7 @@ function initXmp3D(){
   canvas.addEventListener('wheel',e=>{e.preventDefault();xmp3d.zoom=Math.max(4.2,Math.min(8,xmp3d.zoom+e.deltaY*.004));xmp3d.camera.position.z=xmp3d.zoom},{passive:false});
   const animate=()=>{xmp3d.frame=requestAnimationFrame(animate);if(xmp3d.root){if(!xmp3d.drag)xmp3d.rotY+=.003;xmp3d.root.rotation.y=xmp3d.rotY;xmp3d.root.rotation.x=xmp3d.rotX;if(xmp3d.aura){xmp3d.aura.rotation.y-=.008;xmp3d.aura.children.forEach(o=>{if(o.userData.phase!==undefined){const t=performance.now()*.001+o.userData.phase;o.position.y=1.65+Math.sin(t*1.6)*.12}})}}renderer.render(scene,camera)};
   animate();document.getElementById('avatar-3d-loading').style.display='none';
- }catch(error){const load=document.getElementById('avatar-3d-loading');if(load)load.textContent='3D model se nepodařilo spustit.';console.error(error)}
+ }catch(error){xmp3dError=error?.message||String(error);const load=document.getElementById('avatar-3d-loading');if(load)load.textContent='CHYBA 3D: '+xmp3dError;console.error('XMP 3D renderer error:',error)}
 }
 function updateThreeAvatar(def,palette,gear,index){
  if(!xmp3d.renderer){initXmp3D();if(!xmp3d.renderer)return}
@@ -912,12 +912,12 @@ function startXmp3D(){
   initXmp3D();
   initLobbyAvatar();
   initAvatarStudio();
-  if(!xmp3d.renderer)throw new Error('3D renderer se nepodařilo vytvořit');
+  if(!xmp3d.renderer)throw new Error(xmp3dError||'3D renderer se nepodařilo vytvořit');
   document.querySelectorAll('.avatar-fallback').forEach(el=>el.remove());
  }catch(error){
   console.error('XMP avatar init failed:',error);
   const note=document.getElementById('avatar-3d-loading');
-  if(note)note.textContent='3D se nepodařilo spustit. Zobrazuji náhradního avatara.';
+  if(note)note.textContent='CHYBA 3D: '+(error?.message||xmp3dError||'Neznámá chyba')+' · zobrazena náhradní postava';
   showAvatarFallback();
   return false;
  }
@@ -936,7 +936,7 @@ function loadThreeFallback(){
  function failAll(){
   if(finished)return;finished=true;
   showAvatarFallback();
-  if(loading)loading.textContent='3D engine se nepodařilo načíst. Zkontroluj internet nebo povol CDN.';
+  if(loading)loading.textContent='CHYBA 3D: nepodařilo se načíst Three.js (CDN / připojení).';
   console.error('XMP 3D: všechny zdroje Three.js selhaly.');
  }
  function attempt(){
