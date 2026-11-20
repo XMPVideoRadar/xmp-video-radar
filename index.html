@@ -924,21 +924,35 @@ function startXmp3D(){
  return true;
 }
 function loadThreeFallback(){
- if(window.THREE){if(!startXmp3D())loadThreeBackup();return;}
- const urls=['https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js','https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];
- let index=0;
+ if(window.THREE){startXmp3D();return;}
+ const urls=[
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js',
+  'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js',
+  'https://unpkg.com/three@0.160.0/build/three.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.159.0/three.min.js'
+ ];
+ let index=0,finished=false;
+ const loading=document.getElementById('avatar-3d-loading');
+ function failAll(){
+  if(finished)return;finished=true;
+  showAvatarFallback();
+  if(loading)loading.textContent='3D engine se nepodařilo načíst. Zkontroluj internet nebo povol CDN.';
+  console.error('XMP 3D: všechny zdroje Three.js selhaly.');
+ }
  function attempt(){
-  if(window.THREE){startXmp3D();return;}
-  if(index>=urls.length){showAvatarFallback();return;}
-  const script=document.createElement('script');script.src=urls[index++];script.onload=()=>{if(!startXmp3D())attempt()};script.onerror=attempt;document.head.appendChild(script);
+  if(finished)return;
+  if(window.THREE){finished=true;if(!startXmp3D())showAvatarFallback();return;}
+  if(index>=urls.length){failAll();return;}
+  const url=urls[index++],script=document.createElement('script');
+  let settled=false;
+  const timer=setTimeout(()=>{if(settled)return;settled=true;script.remove();attempt()},9000);
+  script.src=url;script.async=true;
+  script.onload=()=>{if(settled)return;settled=true;clearTimeout(timer);if(window.THREE){finished=true;if(!startXmp3D())showAvatarFallback()}else attempt()};
+  script.onerror=()=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();attempt()};
+  document.head.appendChild(script);
  }
  attempt();
 }
-function loadThreeBackup(){
- const urls=['https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js','https://unpkg.com/three@0.160.0/build/three.min.js'];
- let i=0;function next(){if(window.THREE){startXmp3D();return;}if(i>=urls.length){showAvatarFallback();return;}const sc=document.createElement('script');sc.src=urls[i++];sc.onload=startXmp3D;sc.onerror=next;document.head.appendChild(sc)}next();
-}
-if(document.readyState==='complete')loadThreeFallback();else window.addEventListener('load',loadThreeFallback,{once:true});
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
 
