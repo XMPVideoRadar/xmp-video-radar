@@ -59,3 +59,49 @@ drop policy if exists "Users add their own favorites" on public.video_favorites;
 create policy "Users add their own favorites" on public.video_favorites for insert to authenticated with check (auth.uid() = user_id);
 drop policy if exists "Users remove their own favorites" on public.video_favorites;
 create policy "Users remove their own favorites" on public.video_favorites for delete to authenticated using (auth.uid() = user_id);
+
+-- Global XMP player leaderboard
+create table if not exists public.profiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  display_name text not null default 'Player' check (char_length(display_name) between 1 and 30),
+  level integer not null default 1 check (level >= 1),
+  xp integer not null default 0 check (xp >= 0),
+  tokens integer not null default 0 check (tokens >= 0),
+  updated_at timestamptz not null default now()
+);
+alter table public.profiles enable row level security;
+drop policy if exists "Leaderboard profiles are publicly readable" on public.profiles;
+create policy "Leaderboard profiles are publicly readable" on public.profiles for select using (true);
+
+create or replace function public.xmp_publish_stats(
+  p_display_name text,
+  p_level integer,
+  p_xp integer,
+  p_tokens integer
+) returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Authentication required';
+  end if;
+  insert into public.profiles(user_id, display_name, level, xp, tokens, updated_at)
+  values (
+    auth.uid(),
+    left(coalesce(nullif(trim(p_display_name), ''), 'Player'), 30),
+    greatest(coalesce(p_level, 1), 1),
+    greatest(coalesce(p_xp, 0), 0),
+    greatest(coalesce(p_tokens, 0), 0),
+    now()
+  )
+  on conflict (user_id) do update set
+    display_name = excluded.display_name,
+    level = excluded.level,
+    xp = excluded.xp,
+    tokens = excluded.tokens,
+    updated_at = now();
+end;
+$$;
+grant execute on function public.xmp_publish_stats(text, integer, integer, integer) to authenticated;
