@@ -1051,6 +1051,33 @@ function loadThreeFallback(){
 })();
 try{initAvatarStudio()}catch(e){console.warn('Optional Avatar Studio initialization skipped:',e)}
 showAvatarFallback(); // Render the 2D avatar immediately; upgrade to 3D if available.
+/* HARD FIX: capture skin clicks and save clicks before any other handler. */
+document.addEventListener('click',function(event){
+ const skinButton=event.target.closest('#avatar-grid button[data-avatar]');
+ if(skinButton){
+  event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+  const index=Number(skinButton.getAttribute('data-avatar'));
+  if(!Number.isInteger(index)||index<0||index>=avatarDefs.length)return;
+  selectedAvatar=index;
+  document.querySelectorAll('#avatar-grid button[data-avatar]').forEach((el,i)=>el.setAttribute('aria-pressed',String(i===index)));
+  try{renderAvatar()}catch(error){console.warn('Skin selected; preview fallback:',error);try{showAvatarFallback()}catch{}}
+  const note=document.getElementById('avatar-save-note');
+  if(note)note.textContent='Vybrán '+avatarDefs[index].name+'. Teď klikni na Uložit avatara.';
+  return;
+ }
+ const saveButton=event.target.closest('#save-avatar');
+ if(saveButton){
+  event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+  const note=document.getElementById('avatar-save-note');
+  try{
+   const payload={id:selectedAvatar,color:document.getElementById('avatar-color')?.value||'skin',gear:document.getElementById('avatar-accessory')?.value||avatarDefs[selectedAvatar].gear};
+   localStorage.setItem(avatarKey,JSON.stringify(payload));
+   if(note)note.textContent='✓ VYBAVENO: '+avatarDefs[selectedAvatar].name+' · Uloženo v tomto prohlížeči.';
+   document.getElementById('avatar-name').textContent=avatarDefs[selectedAvatar].name.toUpperCase();
+   try{heartBurst()}catch{}
+  }catch(error){if(note)note.textContent='Chyba ukládání: '+String(error&&error.message||error)}
+ }
+},true);
 loadThreeFallback();
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
