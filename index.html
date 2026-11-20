@@ -825,10 +825,12 @@ function updateThreeAvatar(def,palette,gear,index){
 let selectedAvatar=0;
 function savedAvatar(){try{return JSON.parse(localStorage.getItem(avatarKey)||'{}')}catch{return {}}}
 function renderAvatar(){
- const def=avatarDefs[selectedAvatar]||avatarDefs[0],color=document.getElementById('avatar-color').value,gear=document.getElementById('avatar-accessory').value,palette=color==='skin'?[def.suit,def.trim]:(avatarColors[color]||[def.suit,def.trim]);
- if(xmp3d&&xmp3d.renderer)updateThreeAvatar(def,palette,gear,selectedAvatar);document.getElementById('avatar-name').textContent=def.name.toUpperCase();
- document.getElementById('avatar-rarity').innerHTML='<span class="rarity-'+def.className+'">'+def.rarity+'</span> · '+esc(def.name.toUpperCase());
+ const def=avatarDefs[selectedAvatar]||avatarDefs[0],color=document.getElementById('avatar-color')?.value||'skin',gear=document.getElementById('avatar-accessory')?.value||def.gear||'⚡',palette=color==='skin'?[def.suit,def.trim]:(avatarColors[color]||[def.suit,def.trim]);
+ if(xmp3d&&xmp3d.renderer)updateThreeAvatar(def,palette,gear,selectedAvatar);
+ const name=document.getElementById('avatar-name');if(name)name.textContent=def.name.toUpperCase();
+ const rarity=document.getElementById('avatar-rarity');if(rarity)rarity.innerHTML='<span class="rarity-'+def.className+'">'+def.rarity+'</span> · '+esc(def.name.toUpperCase());
  document.querySelectorAll('.avatar-choice').forEach((el,i)=>el.setAttribute('aria-pressed',String(i===selectedAvatar)));
+ showAvatarFallback();
 }
 const avatarUnlockLevels=[1,2,3,4,5,10,12,14,16,20,25,30,35,40,45,50,60,65,70,75,100,110,120,135,150,200,225,250,275,300,350,375,400,425,450,500,540,580,620,650,750,800,850,875,900,1000,1100,1200,1350,1500,2500,2600,2750,2900,3000,5000,5250,5500,5750,6000,7500,7600,7750,7900,8000,9000,9100,9250,9400,9500,10000,11000,12000,13500,15000];
 function currentLevel(){const data=readSaved(),favorites=videos.filter(v=>entry(data,videoId(v)).favorite).length,ratings=videos.filter(v=>Number(entry(data,videoId(v)).rating)>0).length,comments=videos.reduce((sum,v)=>sum+(Array.isArray(entry(data,videoId(v)).comments)?entry(data,videoId(v)).comments.length:0),0);let claimed=false;try{claimed=localStorage.getItem('xmp-quest-claimed-v1')===new Date().toLocaleDateString('sv-SE')}catch{}return Math.floor((favorites*5+ratings*3+comments*2+(claimed?25:0)+getBonusXp())/100)+1}
@@ -897,14 +899,14 @@ for(const [label,fn] of [['playlist',syncPlaylistUI],['profile',applyProfile],['
 }
 setInterval(()=>{try{load()}catch(error){console.error('XMP refresh failed:',error)}},300000);
 function showAvatarFallback(){
- const make=()=>'<div class="avatar-fallback"><div class="avatar-figure"><div class="avatar-gear">⚡</div><div class="avatar-head"><i class="avatar-eye left"></i><i class="avatar-eye right"></i><i class="avatar-mouth"></i></div><div class="avatar-body"></div><div class="avatar-arm left"></div><div class="avatar-arm right"></div><div class="avatar-leg left"></div><div class="avatar-leg right"></div></div></div>';
+ const def=avatarDefs[selectedAvatar]||avatarDefs[0],color=document.getElementById('avatar-color')?.value||'skin',gear=document.getElementById('avatar-accessory')?.value||def.gear||'⚡',palette=color==='skin'?[def.suit,def.trim]:(avatarColors[color]||[def.suit,def.trim]);
+ const make=()=>'<div class="avatar-fallback"><div class="avatar-figure '+def.className+'" style="--suit:'+palette[0]+';--trim:'+palette[1]+'"><div class="avatar-gear">'+esc(gear)+'</div><div class="avatar-head"><i class="avatar-eye left"></i><i class="avatar-eye right"></i><i class="avatar-mouth"></i></div><div class="avatar-body"></div><div class="avatar-arm left"></div><div class="avatar-arm right"></div><div class="avatar-leg left"></div><div class="avatar-leg right"></div></div></div>';
  for(const id of ['avatar-3d-stage','hero-character-stage']){
   const host=document.getElementById(id);if(!host)continue;
-  let fallback=host.querySelector('.avatar-fallback');
-  if(!fallback){host.insertAdjacentHTML('beforeend',make());}
+  if(id==='avatar-3d-stage'&&xmp3d&&xmp3d.renderer){host.querySelector('.avatar-fallback')?.remove();continue;}
+  host.querySelector('.avatar-fallback')?.remove();host.insertAdjacentHTML('beforeend',make());
  }
- const loading=document.getElementById('avatar-3d-loading');
- if(loading)loading.textContent='3D není dostupné – zobrazuji náhradního avatara.';
+ const loading=document.getElementById('avatar-3d-loading');if(loading){loading.textContent='';loading.style.display='none';}
 }
 function startXmp3D(){
  try{
@@ -974,6 +976,7 @@ function loadThreeFallback(){
  };
 })();
 try{initAvatarStudio()}catch(e){console.warn('Optional Avatar Studio initialization skipped:',e)}
+showAvatarFallback(); // Render the 2D avatar immediately; upgrade to 3D if available.
 loadThreeFallback();
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
