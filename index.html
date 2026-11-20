@@ -953,8 +953,9 @@ function loadThreeFallback(){
  }
  attempt();
 }
-/* Start avatar UI independently from the external 3D library. */
-try{initAvatarStudio()}catch(e){console.error('Avatar Studio UI init failed',e);window.__xmpAvatarStudioInitialized=false;const g=document.getElementById('avatar-grid');if(g&&Array.isArray(avatarDefs))g.innerHTML=avatarDefs.map((a,i)=>'<button class="avatar-choice" type="button" data-avatar="'+i+'"><span class="mini-avatar" style="--suit:'+a.suit+';--trim:'+a.trim+'"></span><b>'+esc(a.name)+'</b><small class="rarity-'+a.className+'">'+a.rarity+'</small></button>').join('');}
+/* Avatar list gets a minimal independent boot, even if 3D or profile code fails. */
+try{const g=document.getElementById('avatar-grid');if(g&&Array.isArray(avatarDefs)){g.innerHTML=avatarDefs.map((a,i)=>{let open=false;try{open=isAvatarUnlocked(i)}catch{}return '<button class="avatar-choice" type="button" data-avatar="'+i+'" '+(open?'':'disabled')+' aria-pressed="'+(i===selectedAvatar)+'"><span class="mini-avatar" style="--suit:'+a.suit+';--trim:'+a.trim+'">'+(open?'':'🔒')+'</span><b>'+esc(a.name)+'</b><small class="rarity-'+a.className+'">'+(open?a.rarity:'LEVEL '+(avatarUnlockLevels[i]||1))+'</small></button>'}).join('');g.addEventListener('click',event=>{const btn=event.target.closest('[data-avatar]');if(!btn||btn.disabled)return;selectedAvatar=Number(btn.dataset.avatar);g.querySelectorAll('[data-avatar]').forEach((el,i)=>el.setAttribute('aria-pressed',String(i===selectedAvatar)));try{renderAvatar()}catch(e){console.warn('Skin selected, preview renderer unavailable',e)}});}}catch(e){console.error('Avatar fallback boot error',e)}
+try{initAvatarStudio()}catch(e){console.error('Avatar Studio UI init failed',e)}
 loadThreeFallback();
 if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduce-motion')}
 </script>
